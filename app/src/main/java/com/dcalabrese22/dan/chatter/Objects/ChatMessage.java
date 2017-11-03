@@ -4,7 +4,7 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dan on 9/7/17.
  */
 
-public class PbMessage {
+public class ChatMessage {
 
     private String messageId;
     private String body;
@@ -13,9 +13,9 @@ public class PbMessage {
     private String type;
     private Long timeStamp;
 
-    public PbMessage() {}
+    public ChatMessage() {}
 
-    public PbMessage(String id, String body, String date, String sender, String type, Long timeStamp) {
+    public ChatMessage(String id, String body, String date, String sender, String type, Long timeStamp) {
         messageId = id;
         this.body = body;
         this.date = date;

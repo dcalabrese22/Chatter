@@ -13,10 +13,10 @@ public class SelectedConversation {
     private View mView;
     private ConversationViewHolder mViewHolder;
     private int mPosition;
-    private PbConversation mConversation;
+    private Conversation mConversation;
 
     public SelectedConversation(View view, ConversationViewHolder viewHolder,
-                                int position, PbConversation conversation) {
+                                int position, Conversation conversation) {
         mView = view;
         mViewHolder = viewHolder;
         mPosition = position;
@@ -35,7 +35,7 @@ public class SelectedConversation {
         return mPosition;
     }
 
-    public PbConversation getConversation() {
+    public Conversation getConversation() {
         return mConversation;
     }
 

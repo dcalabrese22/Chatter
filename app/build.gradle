@@ -3,7 +3,7 @@ android {
     compileSdkVersion 26
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.dcalabrese22.dan.pbchat"
+        applicationId "com.dcalabrese22.dan.chatter"
         minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
@@ -33,7 +33,8 @@ dependencies {
 
 
 
-
+    compile 'com.jakewharton:butterknife:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'
     compile 'com.google.firebase:firebase-auth:11.4.2'
@@ -44,6 +45,8 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'de.hdodenhof:circleimageview:1.3.0'
     compile 'com.google.firebase:firebase-messaging:11.4.2'
+    compile 'com.google.firebase:firebase-storage:11.4.2'
+
 
     testCompile 'junit:junit:4.12'
     compile 'com.firebaseui:firebase-ui-database:2.3.0'

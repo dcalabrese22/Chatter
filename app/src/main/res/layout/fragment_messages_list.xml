@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.dcalabrese22.dan.pbmessenger.fragments.MessagesListFragment">
+    tools:context="com.dcalabrese22.dan.chatter.fragments.MessagesListFragment">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_conversations"

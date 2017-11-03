@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "44711998655",
-    "firebase_url": "https://pbchat-61dd6.firebaseio.com",
-    "project_id": "pbchat-61dd6",
-    "storage_bucket": "pbchat-61dd6.appspot.com"
+    "project_number": "110594467054",
+    "firebase_url": "https://chatter-40b44.firebaseio.com",
+    "project_id": "chatter-40b44",
+    "storage_bucket": "chatter-40b44.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:44711998655:android:4035496c57129176",
+        "mobilesdk_app_id": "1:110594467054:android:a201610b9d918e2d",
         "android_client_info": {
-          "package_name": "com.dcalabrese22.dan.pbchat"
+          "package_name": "com.dcalabrese22.dan.chatter"
         }
       },
       "oauth_client": [
         {
-          "client_id": "44711998655-g1tf0pq5mjlgsqpq817so59flb97grfs.apps.googleusercontent.com",
+          "client_id": "110594467054-juqgr72ashcfg65nl7r0i2g37sh9hrio.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBGDLCHrLI8pBVeYbX0CJkjS5ZL3vKP32o"
+          "current_key": "AIzaSyCATX7rs0AqY3W5jT96OJYAngzk0WVNAVc"
         }
       ],
       "services": {

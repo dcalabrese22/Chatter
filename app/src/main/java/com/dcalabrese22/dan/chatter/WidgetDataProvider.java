@@ -8,7 +8,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.dcalabrese22.dan.chatter.Objects.PbConversation;
+import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,7 +26,7 @@ import java.util.List;
 public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     private Context mContext = null;
-    private ArrayList<PbConversation> mConversations = new ArrayList<>();
+    private ArrayList<Conversation> mConversations = new ArrayList<>();
     private List<String> fakeData = new ArrayList<>();
     private AppWidgetManager mManager;
     private int[] mWidgetIds;
@@ -53,7 +53,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    PbConversation c = child.getValue(PbConversation.class);
+                    Conversation c = child.getValue(Conversation.class);
                     mConversations.add(c);
                     mManager.notifyAppWidgetViewDataChanged(mWidgetIds, R.id.lv_widget_conversations);
                 }
@@ -88,7 +88,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_conversation);
 
-        view.setTextViewText(R.id.widget_conversation_user, mConversations.get(position).getUser());
+
         view.setTextViewText(R.id.widget_conversation_subject,
                 mConversations.get(position).getTitle());
         view.setTextViewText(R.id.widget_conversation_last_message,

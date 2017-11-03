@@ -39,10 +39,9 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
 
         String refreshToken = FirebaseInstanceId.getInstance().getToken();
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference tokenRef = FirebaseDatabase.getInstance().getReference()
-                .child("users");
+        DatabaseReference tokenRef = FirebaseDatabase.getInstance().getReference();
 
-        tokenRef.child(userId).child("token").setValue(refreshToken);
+        tokenRef.child("RefreshTokens").child(userId).child(refreshToken).setValue(true);
 
 
     }

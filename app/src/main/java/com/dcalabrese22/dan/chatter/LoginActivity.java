@@ -110,6 +110,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
             @Override
             public void onClick(View view) {
                 createNewUser(reference);
+                Toast.makeText(mContext, "Register Pressed", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -144,6 +145,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         mProgressbar.setVisibility(View.VISIBLE);
+                        FirebaseUser user = mAuth.getCurrentUser();
+
                         Intent intent = new Intent(mContext, MainActivity.class);
                         startActivity(intent);
                     }
@@ -263,6 +266,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         String enteredEmail = mEmail.getText().toString();
         String enteredPass = mPassword.getText().toString();
         outState.putString(SAVED_EMAIL, enteredEmail);

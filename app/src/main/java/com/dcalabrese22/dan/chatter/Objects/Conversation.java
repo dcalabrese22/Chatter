@@ -4,26 +4,23 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dan on 9/7/17.
  */
 
-public class PbConversation {
+public class Conversation {
 
     private String id;
     private String title;
-    private String user;
-    private String userImage;
     private String lastMessage;
     private String lastMessageType;
     private Long timeStamp;
     private String pushKey;
 
-    public PbConversation() {}
+    public Conversation() {}
 
-    public PbConversation(String id, String title, String user, String lastMessage, String userImage,
-                          String lastMessageType, Long timeStamp, String pushKey) {
+    public Conversation(String id, String title, String user, String lastMessage, String userImage,
+                        String lastMessageType, Long timeStamp, String pushKey) {
         this.title = title;
         this.id = id;
-        this.user = user;
         this.lastMessage = lastMessage;
-        this.userImage = userImage;
+
         this.lastMessageType = lastMessageType;
         this.timeStamp = timeStamp;
         this.pushKey = pushKey;
@@ -61,22 +58,6 @@ public class PbConversation {
         this.title = title;
     }
 
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getUserImage() {
-        return userImage;
-    }
-
-    public void setUserImage(String userImage) {
-        this.userImage = userImage;
-    }
-
     public String getLastMessage() {
         return lastMessage;
     }
@@ -100,7 +81,7 @@ public class PbConversation {
 
     @Override
     public boolean equals(Object obj) {
-        PbConversation c = (PbConversation) obj;
+        Conversation c = (Conversation) obj;
         if (c.getId().equals(id)) {
             return true;
         } else {

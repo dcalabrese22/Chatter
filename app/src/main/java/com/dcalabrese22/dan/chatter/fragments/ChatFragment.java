@@ -18,7 +18,7 @@ import android.widget.EditText;
 
 import com.dcalabrese22.dan.chatter.ChatViewHolder;
 import com.dcalabrese22.dan.chatter.MainActivity;
-import com.dcalabrese22.dan.chatter.Objects.PbMessage;
+import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
 import com.dcalabrese22.dan.chatter.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,7 +40,7 @@ public class ChatFragment extends Fragment {
 
     private String mMessageId;
     private String mCorrespondent;
-    private FirebaseRecyclerAdapter<PbMessage, RecyclerView.ViewHolder> mAdapter;
+    private FirebaseRecyclerAdapter<ChatMessage, RecyclerView.ViewHolder> mAdapter;
 
 
     public ChatFragment() {
@@ -115,7 +115,7 @@ public class ChatFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            PbMessage message = snapshot.getValue(PbMessage.class);
+                            ChatMessage message = snapshot.getValue(ChatMessage.class);
                             final String lastKey = message.getMessageId();
                             String nextKey = Integer.toString(Integer.parseInt(lastKey) + 1);
                             final String body = reply.getText().toString();
@@ -125,7 +125,7 @@ public class ChatFragment extends Fragment {
                             Date now = Calendar.getInstance().getTime();
                             Long timeStamp = new Date().getTime();
                             Log.d("Now: ", now.toString());
-                            PbMessage newMessage = new PbMessage(nextKey, body, now.toString(),
+                            ChatMessage newMessage = new ChatMessage(nextKey, body, now.toString(),
                                     name, "sent", timeStamp);
                             Map<String, Object> m = new HashMap<>();
                             m.put(nextKey, newMessage);
@@ -174,8 +174,8 @@ public class ChatFragment extends Fragment {
         recyclerView.setLayoutManager(ll);
 
 
-        mAdapter = new FirebaseRecyclerAdapter<PbMessage, RecyclerView.ViewHolder>(
-                PbMessage.class,
+        mAdapter = new FirebaseRecyclerAdapter<ChatMessage, RecyclerView.ViewHolder>(
+                ChatMessage.class,
                 R.layout.chat_incoming,
                 RecyclerView.ViewHolder.class,
                 reference
@@ -185,7 +185,7 @@ public class ChatFragment extends Fragment {
 
 
             @Override
-            protected void populateViewHolder(RecyclerView.ViewHolder viewHolder, PbMessage model,
+            protected void populateViewHolder(RecyclerView.ViewHolder viewHolder, ChatMessage model,
                                               int position) {
 
                 ((ChatViewHolder) viewHolder).setChatBody(model.getBody());
@@ -194,7 +194,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public int getItemViewType(int position) {
-                PbMessage message = getItem(position);
+                ChatMessage message = getItem(position);
                 if (message.getType().equals("sent")) {
                     return VIEWTYPE_OUTGOING;
                 } else {

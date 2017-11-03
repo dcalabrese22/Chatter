@@ -12,8 +12,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
-
-import com.dcalabrese22.dan.chatter.Objects.PbConversation;
+import com.dcalabrese22.dan.chatter.Objects.Conversation;
+import com.dcalabrese22.dan.chatter.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -64,7 +64,7 @@ public class NewMessageFragment extends Fragment {
                 } else {
                     String key = uidReference.push().getKey();
                     Long timeStamp = new Date().getTime();
-                    PbConversation conversation = new PbConversation(key,
+                    Conversation conversation = new Conversation(key,
                             subject.getText().toString(),mName.getText().toString(),
                             body.getText().toString(), "null", "sent", timeStamp, key);
 
@@ -72,7 +72,7 @@ public class NewMessageFragment extends Fragment {
 //                    Date now = Calendar.getInstance().getTime();
 //                    Long time = new Date().getTime();
 //
-//                    PbMessage message = new PbMessage("0",
+//                    ChatMessage message = new ChatMessage("0",
 //                            body.getText().toString(),
 //                            now.toString(),
 //                            FirebaseAuth.getInstance().getCurrentUser().getEmail().split("@")[0],
@@ -99,9 +99,9 @@ public class NewMessageFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    PbConversation conversation = snapshot.getValue(PbConversation.class);
-                    String userName = conversation.getUser();
-                    autoCompleteNames.add(userName);
+                    Conversation conversation = snapshot.getValue(Conversation.class);
+
+
                 }
             }
 

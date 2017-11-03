@@ -1,9 +1,13 @@
 <resources>
-    <string name="app_name">Pb Messenger</string>
+    <string name="app_name">Chatter</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
+    <string name="prompt_age">Age</string>
+    <string name="prompt_gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_email">This email address is invalid</string>
@@ -24,7 +28,7 @@
     <string name="new_message_name_hint">Name</string>
     <string name="new_message_subject_hint">Subject</string>
     <string name="new_message_body_hint">Enter message</string>
-    <string name="pb_chat">Pinkbike Chat</string>
+    <string name="pb_chat">Chatter</string>
     <string name="logout">Logout</string>
     <string name="avatar_showing">avatar</string>
     <string name="checked">checked</string>
@@ -35,5 +39,11 @@
     <string name="firebase_token_pref">com.dcalabrese22.dan.pbmessenger.FIREBASE_TOKEN_KEY</string>
     <string name="current_firebase_token">firebase_token</string>
     <string name="action_create_new_user">Register</string>
+    <string name="btn_sign_up">Sign Up</string>
+    <string name="btn_link_login">Login</string>
+    <string name="existing_account">Already have an account? Login here!</string>
+    <string name="prompt_name">Name</string>
+    <string name="prompt_image">Image</string>
+    <string name="btn_browse">Browse</string>
 
 </resources>

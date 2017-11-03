@@ -24,7 +24,7 @@ import android.widget.Toast;
 
 import com.dcalabrese22.dan.chatter.ConversationViewHolder;
 import com.dcalabrese22.dan.chatter.MultiSelectFirebaseRecyclerAdapter;
-import com.dcalabrese22.dan.chatter.Objects.PbConversation;
+import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.SelectedConversation;
 import com.dcalabrese22.dan.chatter.PbAppWidget;
 import com.dcalabrese22.dan.chatter.R;
@@ -49,7 +49,7 @@ public class MessagesListFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ActionMode mActionMode;
     private ArrayList<SelectedConversation> mSelectedConversations = new ArrayList<>();
-    private ArrayList<PbConversation> mSelectedPbConversations = new ArrayList<>();
+    private ArrayList<Conversation> mSelectedPbConversations = new ArrayList<>();
     public static final String SHARED_PREF = "shared_pref_conversation";
 
     public MessagesListFragment() {
@@ -90,13 +90,12 @@ public class MessagesListFragment extends Fragment {
         mUserId = user.getUid();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("conversations")
-                .child(mUserId);
+                .child("chats");
 
         reference.orderByChild("timeStamp");
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
-        mAdapter = new MultiSelectFirebaseRecyclerAdapter(context, PbConversation.class,
+        mAdapter = new MultiSelectFirebaseRecyclerAdapter(context, Conversation.class,
                 R.layout.conversation, ConversationViewHolder.class,
                 reference, mListener, progressBar, mSelectedConversations);
 
@@ -109,10 +108,10 @@ public class MessagesListFragment extends Fragment {
                         if (mIsMultiSelectMode) {
                             multiSelect(view, position);
                         } else {
-                            PbConversation itemClicked = mAdapter.getItem(position);
+                            Conversation itemClicked = mAdapter.getItem(position);
                             String id = itemClicked.getId();
-                            String user = itemClicked.getUser();
-                            mListener.getMessageUser(user);
+
+
                             mListener.sendMessageId(id);
                         }
                     }
@@ -211,7 +210,7 @@ public class MessagesListFragment extends Fragment {
     public void multiSelect(View view, int position) {
         ConversationViewHolder viewHolder = (ConversationViewHolder) mRecyclerView
                 .getChildViewHolder(view);
-        PbConversation selected = mAdapter.getItem(position);
+        Conversation selected = mAdapter.getItem(position);
         SelectedConversation selectedConversation = new SelectedConversation(view, viewHolder,
                 position, selected);
         if (mActionMode != null) {
@@ -220,7 +219,7 @@ public class MessagesListFragment extends Fragment {
                 view.setActivated(false);
                 mSelectedPbConversations.remove(selected);
                 for (Iterator<SelectedConversation> i = mSelectedConversations.listIterator(); i.hasNext();) {
-                    PbConversation c = i.next().getConversation();
+                    Conversation c = i.next().getConversation();
                     if (c.equals(selected)) {
                         i.remove();
                     }

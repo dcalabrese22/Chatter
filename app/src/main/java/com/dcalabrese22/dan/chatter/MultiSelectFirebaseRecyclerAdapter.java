@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.dcalabrese22.dan.chatter.Objects.PbConversation;
+import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.SelectedConversation;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by dan on 10/8/17.
  */
 
-public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<PbConversation, ConversationViewHolder> {
+public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Conversation, ConversationViewHolder> {
 
     private Context mContext;
     private MessageExtrasListener mListener;
@@ -35,11 +35,11 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
     }
 
     @Override
-    protected void populateViewHolder(ConversationViewHolder viewHolder, PbConversation model, int position) {
+    protected void populateViewHolder(ConversationViewHolder viewHolder, Conversation model, int position) {
         viewHolder.setSubject(model.getTitle());
-        viewHolder.setUser(model.getUser());
+
         viewHolder.setLastMessage(model.getLastMessage());
-        viewHolder.setAvatar(model.getUserImage(), mContext);
+
     }
 
 //    @Override
@@ -48,7 +48,7 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
 //        viewHolder.setOnClickListener(new ConversationClickListener() {
 //            @Override
 //            public void onConversationClick(View view, int position) {
-//                PbConversation model = getItem(position);
+//                Conversation model = getItem(position);
 //                String id = model.getId();
 //                String user = model.getUser();
 //                mListener.getMessageUser(user);

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.dcalabrese22.dan.pbmessenger.MainActivity">
+    tools:context="com.dcalabrese22.dan.chatter.MainActivity">
 
     <ScrollView
         android:id="@+id/chat_scrollview"

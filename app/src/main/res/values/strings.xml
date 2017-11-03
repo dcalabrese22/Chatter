@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Pb Messenger</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+
+    <string name="missing_fields">All fields must be complete before sending</string>
+
+    <string name="auth_failed">The email or password entered is invalid</string>
+    <string name="enter_credentials">Please enter credentials before continuing</string>
+
+
+    <string name="new_message_fragment_title">New Conversation</string>
+    <string name="new_message_name_hint">Name</string>
+    <string name="new_message_subject_hint">Subject</string>
+    <string name="new_message_body_hint">Enter message</string>
+    <string name="pb_chat">Pinkbike Chat</string>
+    <string name="logout">Logout</string>
+    <string name="avatar_showing">avatar</string>
+    <string name="checked">checked</string>
+    <string name="menu_item_delete">Delete</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
+    <string name="firebase_token_pref">com.dcalabrese22.dan.pbmessenger.FIREBASE_TOKEN_KEY</string>
+    <string name="current_firebase_token">firebase_token</string>
+    <string name="action_create_new_user">Register</string>
+
+</resources>

@@ -1,24 +1,17 @@
 package com.dcalabrese22.dan.chatter;
 
 import android.Manifest;
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.provider.ContactsContract;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.dcalabrese22.dan.chatter.helpers.ProfileQuery;
+import com.dcalabrese22.dan.chatter.helpers.EmailLoader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -35,13 +28,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class LoginActivity extends AppCompatActivity {
 
 
     private static final String TAG = "LoginActivity";
@@ -59,8 +49,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -195,39 +183,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
     }
 
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this,
-                ContactsContract.Data.CONTENT_URI,
-                ProfileQuery.PROJECTION,
-                ProfileQuery.SELECTION,
-                ProfileQuery.ARGS,
-                ProfileQuery.SORT);
-    }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
-        List<String> emails = new ArrayList<>();
-        data.moveToFirst();
-        while (!data.isAfterLast()) {
-            emails.add(data.getString(0));
-            data.moveToNext();
-            addEmailsToAutoComplete(emails);
-        }
-
-    }
-
-    private void addEmailsToAutoComplete(List<String> emails) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(LoginActivity.this,
-                android.R.layout.simple_dropdown_item_1line, emails);
-        mEmail.setAdapter(adapter);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-
-    }
 
     private boolean mayRequestContacts() {
 
@@ -261,7 +217,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderManager.Lo
         if (!mayRequestContacts()) {
             return;
         }
-        getLoaderManager().initLoader(0, null, this);
+        EmailLoader emailLoader = new EmailLoader(this, mEmail);
+        getLoaderManager().initLoader(0, null, emailLoader);
     }
 
     @Override

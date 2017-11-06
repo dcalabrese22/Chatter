@@ -11,7 +11,23 @@ public class User {
     private String email;
     private String age;
     private String gender;
-    private String userImage;
+    private Boolean hasUserImage;
+
+    public User(String name, String email, String age, String gender, Boolean hasUserImage) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+        this.gender = gender;
+        this.hasUserImage = hasUserImage;
+    }
+
+    public Boolean getHasUserImage() {
+        return hasUserImage;
+    }
+
+    public void setHasUserImage(Boolean hasUserImage) {
+        this.hasUserImage = hasUserImage;
+    }
 
     public String getUserName() {
         return userName;
@@ -27,14 +43,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getUserImage() {
-        return userImage;
-    }
-
-    public void setUserImage(String userImage) {
-        this.userImage = userImage;
     }
 
     public String getGender() {

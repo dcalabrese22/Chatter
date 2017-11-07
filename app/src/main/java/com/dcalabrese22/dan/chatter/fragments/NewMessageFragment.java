@@ -27,10 +27,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class NewMessageFragment extends Fragment {
 
-    private AutoCompleteTextView mName;
+    @BindView(R.id.et_new_message_to)
+    AutoCompleteTextView mName;
+    @BindView(R.id.et_new_message_subject)
+    EditText mSubject;
+    @BindView(R.id.et_new_message_body)
+    EditText mBody;
+
 
 
     public NewMessageFragment() {
@@ -42,53 +51,17 @@ public class NewMessageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        ButterKnife.bind(getActivity());
         View rootView = inflater.inflate(R.layout.fragment_new_message, container, false);
-        mName = (AutoCompleteTextView) rootView.findViewById(R.id.et_new_message_to);
-        final EditText subject = (EditText) rootView.findViewById(R.id.et_new_message_subject);
-        final EditText body = (EditText) rootView.findViewById(R.id.et_new_message_body);
         FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab_new_message);
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("conversations");
 
         final DatabaseReference uidReference = reference.child(userId);
-        final DatabaseReference messagesRef = FirebaseDatabase.getInstance().getReference("messages");
+        final DatabaseReference messagesRef = FirebaseDatabase.getInstance().getReference("chats");
 
-        fab.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if (mName.getText().toString().equals("") || subject.getText().toString().equals("")
-                        || body.getText().toString().equals("")) {
-                    Toast.makeText(getContext(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
-                } else {
-                    String key = uidReference.push().getKey();
-                    Long timeStamp = new Date().getTime();
-                    Conversation conversation = new Conversation(key,
-                            subject.getText().toString(),mName.getText().toString(),
-                            body.getText().toString(), "null", "sent", timeStamp, key);
-
-                    uidReference.child(key).setValue(conversation);
-//                    Date now = Calendar.getInstance().getTime();
-//                    Long time = new Date().getTime();
-//
-//                    ChatMessage message = new ChatMessage("0",
-//                            body.getText().toString(),
-//                            now.toString(),
-//                            FirebaseAuth.getInstance().getCurrentUser().getEmail().split("@")[0],
-//                            "sent",
-//                            time);
-//                    Map<String, Object> map = new HashMap<>();
-//                    map.put("0", message);
-//                    AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
-//                    int[] ids = manager.getAppWidgetIds(new ComponentName(getContext()
-//                            .getPackageName(), PbAppWidget.class.getName()));
-//                    manager.notifyAppWidgetViewDataChanged(ids, R.id.lv_widget_conversations);
-//                    messagesRef.child(key).updateChildren(map);
-                    getActivity().getSupportFragmentManager().popBackStack();
-                }
-            }
-        });
+        fab.setOnClickListener(new SendNewMessageListener());
 
         final List<String> autoCompleteNames = new ArrayList<>();
 
@@ -100,8 +73,6 @@ public class NewMessageFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Conversation conversation = snapshot.getValue(Conversation.class);
-
-
                 }
             }
 
@@ -111,13 +82,30 @@ public class NewMessageFragment extends Fragment {
             }
         });
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_dropdown_item_1line, autoCompleteNames);
         mName.setAdapter(adapter);
 
-
-
         return rootView;
+    }
+
+    private class SendNewMessageListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            if (mName.getText().toString().equals("") || mSubject.getText().toString().equals("")
+                    || mBody.getText().toString().equals("")) {
+                Toast.makeText(getContext(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
+            } else {
+                DatabaseReference conversationRef = FirebaseDatabase.getInstance().getReference()
+                        .child("conversations").push();
+                Long timeStamp = new Date().getTime();
+                Conversation conversation = new Conversation(mBody.getText().toString(),
+                        "sent", timeStamp, );
+
+                conversationRef.setValue(conversation);
+                getActivity().getSupportFragmentManager().popBackStack();
+            }
+        }
     }
 
 }

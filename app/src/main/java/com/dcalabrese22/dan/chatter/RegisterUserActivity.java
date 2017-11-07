@@ -1,6 +1,5 @@
 package com.dcalabrese22.dan.chatter;
 
-import android.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,9 +13,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.helpers.EmailLoader;
@@ -27,7 +28,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -47,7 +52,7 @@ public class RegisterUserActivity extends AppCompatActivity {
     @BindView(R.id.signup_input_name)
     EditText mName;
     @BindView(R.id.signup_input_email)
-    EditText mEmail;
+    AutoCompleteTextView mEmail;
     @BindView(R.id.signup_input_password)
     EditText mPassword;
     @BindView(R.id.signup_input_age)
@@ -64,9 +69,12 @@ public class RegisterUserActivity extends AppCompatActivity {
 
     public static final int PICK_IMAGE = 1;
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
     private boolean mHasUserImage = false;
     private Context mContext;
     private byte[] mBitmapByteArray;
+    private static final int REQUEST_READ_CONTACTS = 100;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,61 +82,90 @@ public class RegisterUserActivity extends AppCompatActivity {
         mContext = this;
         setContentView(R.layout.activity_register_user);
 
-//        mName = findViewById(R.id.signup_input_name);
-//        mEmail = findViewById(R.id.signup_input_email);
-//        mPassword = findViewById(R.id.signup_input_password);
-//        mAge = findViewById(R.id.signup_input_age);
-//        mRadioGroup = findViewById(R.id.gender_radio_group);
-//        mSignup = find
-
         ButterKnife.bind(this);
 
         mAuth = FirebaseAuth.getInstance();
 
+        populateAutoComplete();
+
         mSignup.setOnClickListener(new SignupOnClickListener());
         mBrowse.setOnClickListener(new BrowseOnClickListener());
+        mLogin.setOnClickListener(new LoginOnClickListener());
+    }
 
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private class LoginOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(mContext, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private class SignupOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            String name = mName.getText().toString();
-            String email = mEmail.getText().toString();
-            String age = mAge.getText().toString();
-            String password = mPassword.getText().toString();
-            int radioId = mRadioGroup.getCheckedRadioButtonId();
-            String gender;
+            final String userName = mName.getText().toString();
+            final String email = mEmail.getText().toString();
+            final String age = mAge.getText().toString();
+            final String password = mPassword.getText().toString();
+            final int radioId = mRadioGroup.getCheckedRadioButtonId();
+            final StringBuilder gender = new StringBuilder();
             switch (radioId) {
                 case (R.id.male_radio_btn):
-                    gender = "male";
+                    gender.append("male");
                     break;
                 case (R.id.female_radio_btn):
-                    gender = "male";
+                    gender.append("female");
                     break;
                 default:
-                    gender = null;
                     break;
             }
 
+            DatabaseReference existingUser = FirebaseDatabase.getInstance()
+                    .getReference().child("users").child(userName);
+            existingUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Toast.makeText(mContext, "Username already exists. Please sign in to " +
+                                "continue or choose a new username.", Toast.LENGTH_LONG).show();
+                    } else if (password.length() < 6) {
+                        Toast.makeText(mContext,
+                                "Password must be at least 6 characters",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        final User user = new User(userName, email, age, gender.toString(), mHasUserImage);
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                                        FirebaseDatabase.getInstance().getReference()
+                                                .child("users")
+                                                .child(userName)
+                                                .setValue(user);
+                                        uploadAvatarToFirebase(mBitmapByteArray);
+                                        Intent intent = new Intent(mContext, MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                });
+                    }
+                }
 
-            final User user = new User(name, email, age, gender, mHasUserImage);
-            mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child("users")
-                                    .child(firebaseUser.getUid())
-                                    .push()
-                                    .setValue(user);
-                            uploadAvatarToFirebase(mBitmapByteArray);
-                            Intent intent = new Intent(mContext, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
     }
 
@@ -139,18 +176,20 @@ public class RegisterUserActivity extends AppCompatActivity {
         StorageReference userImageRef = imagesRef
                 .child(mAuth.getCurrentUser().getEmail())
                 .child("avatar.jpg");
-        UploadTask uploadTask = userImageRef.putBytes(dataArray);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+        if (dataArray != null) {
+            UploadTask uploadTask = userImageRef.putBytes(dataArray);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
 
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Log.d("Success", " yes");
-            }
-        });
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    Log.d("Success", " yes");
+                }
+            });
+        }
     }
 
     private class BrowseOnClickListener implements View.OnClickListener {
@@ -222,5 +261,13 @@ public class RegisterUserActivity extends AppCompatActivity {
         }
         EmailLoader emailLoader = new EmailLoader(this, mEmail);
         getLoaderManager().initLoader(0, null, emailLoader);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
     }
 }

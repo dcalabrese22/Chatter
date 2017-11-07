@@ -6,32 +6,37 @@ package com.dcalabrese22.dan.chatter.Objects;
 
 public class Conversation {
 
-    private String id;
-    private String title;
     private String lastMessage;
     private String lastMessageType;
     private Long timeStamp;
-    private String pushKey;
+    private String user1;
+    private String user2;
 
     public Conversation() {}
 
-    public Conversation(String id, String title, String user, String lastMessage, String userImage,
-                        String lastMessageType, Long timeStamp, String pushKey) {
-        this.title = title;
-        this.id = id;
+    public Conversation(String lastMessage, String lastMessageType, Long timeStamp, String user1,
+                        String user2) {
         this.lastMessage = lastMessage;
-
         this.lastMessageType = lastMessageType;
         this.timeStamp = timeStamp;
-        this.pushKey = pushKey;
+        this.user1 = user1;
+        this.user2 = user2;
     }
 
-    public String getPushKey() {
-        return pushKey;
+    public String getUser1() {
+        return user1;
     }
 
-    public void setPushKey(String pushKey) {
-        this.pushKey = pushKey;
+    public void setUser1(String user1) {
+        this.user1 = user1;
+    }
+
+    public String getUser2() {
+        return user2;
+    }
+
+    public void setUser2(String user2) {
+        this.user2 = user2;
     }
 
     public Long getTimeStamp() {
@@ -40,22 +45,6 @@ public class Conversation {
 
     public String getLastMessageType() {
         return lastMessageType;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getLastMessage() {
@@ -74,19 +63,5 @@ public class Conversation {
         this.timeStamp = timeStamp;
     }
 
-    @Override
-    public String toString() {
-        return title;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        Conversation c = (Conversation) obj;
-        if (c.getId().equals(id)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
 

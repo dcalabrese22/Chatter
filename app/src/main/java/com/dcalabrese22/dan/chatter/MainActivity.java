@@ -12,12 +12,13 @@ import android.view.MenuItem;
 import com.dcalabrese22.dan.chatter.fragments.ChatFragment;
 import com.dcalabrese22.dan.chatter.fragments.MessagesListFragment;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
+import com.dcalabrese22.dan.chatter.interfaces.UserNameListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
 
-public class MainActivity extends AppCompatActivity implements MessageExtrasListener {
+public class MainActivity extends AppCompatActivity implements MessageExtrasListener, UserNameListener {
 
     public static final String MESSAGE_ID_KEY = "message_id_key";
     public static final String MESSAGE_USER_KEY = "message_user_key";

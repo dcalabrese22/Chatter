@@ -13,8 +13,8 @@ public class User {
     private String gender;
     private Boolean hasUserImage;
 
-    public User(String name, String email, String age, String gender, Boolean hasUserImage) {
-        this.name = name;
+    public User(String userName, String email, String age, String gender, Boolean hasUserImage) {
+        this.userName = userName;
         this.email = email;
         this.age = age;
         this.gender = gender;
@@ -35,14 +35,6 @@ public class User {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getGender() {

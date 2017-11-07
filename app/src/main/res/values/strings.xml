@@ -42,7 +42,7 @@
     <string name="btn_sign_up">Sign Up</string>
     <string name="btn_link_login">Login</string>
     <string name="existing_account">Already have an account? Login here!</string>
-    <string name="prompt_name">Name</string>
+    <string name="prompt_name">Username</string>
     <string name="prompt_image">Image</string>
     <string name="btn_browse">Browse</string>
 

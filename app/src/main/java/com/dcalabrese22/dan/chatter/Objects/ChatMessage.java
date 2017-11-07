@@ -6,19 +6,15 @@ package com.dcalabrese22.dan.chatter.Objects;
 
 public class ChatMessage {
 
-    private String messageId;
     private String body;
-    private String date;
     private String sender;
     private String type;
     private Long timeStamp;
 
     public ChatMessage() {}
 
-    public ChatMessage(String id, String body, String date, String sender, String type, Long timeStamp) {
-        messageId = id;
+    public ChatMessage(String body, String sender, String type, Long timeStamp) {
         this.body = body;
-        this.date = date;
         this.sender = sender;
         this.type = type;
         this.timeStamp = timeStamp;
@@ -32,16 +28,8 @@ public class ChatMessage {
         this.timeStamp = timeStamp;
     }
 
-    public String getMessageId() {
-        return messageId;
-    }
-
     public String getBody() {
         return body;
-    }
-
-    public String getDate() {
-        return date;
     }
 
     public String getSender() {
@@ -52,16 +40,8 @@ public class ChatMessage {
         return type;
     }
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
-
     public void setBody(String body) {
         this.body = body;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public void setSender(String sender) {

@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp">
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/signup_input_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,12 +77,17 @@
                 android:text="@string/prompt_image"
                 android:textSize="20sp"
                 android:paddingStart="15dp"
+
                 android:id="@+id/textview_image"/>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/btn_browse"
+                android:layout_marginStart="10dp"
+
+                android:background="@color/colorPrimaryDark"
+                android:textColor="@android:color/white"
                 android:layout_toEndOf="@id/textview_image"
                 android:text="@string/btn_browse"/>
 
@@ -123,13 +128,14 @@
             </RadioGroup>
         </RelativeLayout>
         <Button android:id="@+id/btn_signup"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/btn_sign_up"
+            android:background="@color/colorPrimaryDark"
             android:layout_marginTop="20dp"
             android:textColor="@android:color/white"/>
         <Button android:id="@+id/btn_link_login"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/existing_account"
             android:background="@null"

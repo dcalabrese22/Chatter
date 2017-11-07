@@ -90,15 +90,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 signInUser();
-
             }
         });
 
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createNewUser(reference);
-                Toast.makeText(mContext, "Register Pressed", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(mContext, RegisterUserActivity.class);
+                startActivity(intent);
+
             }
         });
 
@@ -149,7 +149,6 @@ public class LoginActivity extends AppCompatActivity {
         if (mEmail.getText().toString().equals("") || mPassword.getText().toString().equals("")) {
             Toast.makeText(mContext, R.string.enter_credentials, Toast.LENGTH_SHORT).show();
         } else {
-
             mAuth.signInWithEmailAndPassword(mEmail.getText().toString(), mPassword.getText().toString())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -205,7 +204,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 populateAutoComplete();

@@ -2,9 +2,6 @@ package com.dcalabrese22.dan.chatter.helpers;
 
 import android.provider.ContactsContract;
 
-/**
- * Created by dan on 9/27/17.
- */
 
 public class ProfileQuery {
 

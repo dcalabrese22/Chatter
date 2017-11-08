@@ -36,7 +36,6 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
 
     @Override
     protected void populateViewHolder(ConversationViewHolder viewHolder, Conversation model, int position) {
-        viewHolder.setSubject(model.getTitle());
 
         viewHolder.setLastMessage(model.getLastMessage());
 

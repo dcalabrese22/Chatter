@@ -116,8 +116,7 @@ public class ChatFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                             ChatMessage message = snapshot.getValue(ChatMessage.class);
-                            final String lastKey = message.getMessageId();
-                            String nextKey = Integer.toString(Integer.parseInt(lastKey) + 1);
+
                             final String body = reply.getText().toString();
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             String name = user.getEmail().split("@")[0];
@@ -125,10 +124,9 @@ public class ChatFragment extends Fragment {
                             Date now = Calendar.getInstance().getTime();
                             Long timeStamp = new Date().getTime();
                             Log.d("Now: ", now.toString());
-                            ChatMessage newMessage = new ChatMessage(nextKey, body, now.toString(),
-                                    name, "sent", timeStamp);
+
                             Map<String, Object> m = new HashMap<>();
-                            m.put(nextKey, newMessage);
+
                             messagRef.updateChildren(m);
                             reply.getText().clear();
                             DatabaseReference pushKeyRef = reference.child("pushKeys")
@@ -192,15 +190,15 @@ public class ChatFragment extends Fragment {
 
             }
 
-            @Override
-            public int getItemViewType(int position) {
-                ChatMessage message = getItem(position);
-                if (message.getType().equals("sent")) {
-                    return VIEWTYPE_OUTGOING;
-                } else {
-                    return VIEWTYPE_INCOMING;
-                }
-            }
+//            @Override
+//            public int getItemViewType(int position) {
+//                ChatMessage message = getItem(position);
+//                if (message.getType().equals("sent")) {
+//                    return VIEWTYPE_OUTGOING;
+//                } else {
+//                    return VIEWTYPE_INCOMING;
+//                }
+//            }
 
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 
 import com.dcalabrese22.dan.chatter.ConversationViewHolder;
 import com.dcalabrese22.dan.chatter.MultiSelectFirebaseRecyclerAdapter;
@@ -89,10 +87,10 @@ public class MessagesListFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mUserId = user.getUid();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("chats");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference conversationRef = reference.child("conversations");
 
-        reference.orderByChild("timeStamp");
+        conversationRef.orderByChild("timeStamp");
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
         mAdapter = new MultiSelectFirebaseRecyclerAdapter(context, Conversation.class,
@@ -109,10 +107,6 @@ public class MessagesListFragment extends Fragment {
                             multiSelect(view, position);
                         } else {
                             Conversation itemClicked = mAdapter.getItem(position);
-                            String id = itemClicked.getId();
-
-
-                            mListener.sendMessageId(id);
                         }
                     }
 
@@ -175,11 +169,7 @@ public class MessagesListFragment extends Fragment {
 
                         DatabaseReference messageRef = FirebaseDatabase.getInstance().getReference()
                                 .child("messages");
-                        String id = selectedConversation.getConversation().getId();
-                        String pushKey = selectedConversation.getConversation().getPushKey();
-                        Log.d("selected id: ", id);
-                        reference.child(pushKey).removeValue();
-                        messageRef.child(id).removeValue();
+
 
                         Intent intent = new Intent(getContext(), PbAppWidget.class);
                         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);

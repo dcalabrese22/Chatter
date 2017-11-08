@@ -150,7 +150,7 @@ public class RegisterUserActivity extends AppCompatActivity {
                                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                                         FirebaseDatabase.getInstance().getReference()
                                                 .child("users")
-                                                .child(userName)
+                                                .child(firebaseUser.getUid())
                                                 .setValue(user);
                                         uploadAvatarToFirebase(mBitmapByteArray);
                                         Intent intent = new Intent(mContext, MainActivity.class);

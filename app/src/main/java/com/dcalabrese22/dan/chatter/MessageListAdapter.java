@@ -33,7 +33,6 @@ public class MessageListAdapter extends FirebaseRecyclerAdapter<Conversation, Co
 
     @Override
     protected void populateViewHolder(ConversationViewHolder viewHolder, Conversation model, int position) {
-        viewHolder.setSubject(model.getTitle());
 
         viewHolder.setLastMessage(model.getLastMessage());
 

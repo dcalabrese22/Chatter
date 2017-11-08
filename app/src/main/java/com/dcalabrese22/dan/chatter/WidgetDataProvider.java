@@ -89,8 +89,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                 R.layout.widget_conversation);
 
 
-        view.setTextViewText(R.id.widget_conversation_subject,
-                mConversations.get(position).getTitle());
         view.setTextViewText(R.id.widget_conversation_last_message,
                 mConversations.get(position).getLastMessage());
 

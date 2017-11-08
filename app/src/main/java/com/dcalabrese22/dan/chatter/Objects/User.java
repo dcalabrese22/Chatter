@@ -13,6 +13,8 @@ public class User {
     private String gender;
     private Boolean hasUserImage;
 
+    public User() {}
+
     public User(String userName, String email, String age, String gender, Boolean hasUserImage) {
         this.userName = userName;
         this.email = email;

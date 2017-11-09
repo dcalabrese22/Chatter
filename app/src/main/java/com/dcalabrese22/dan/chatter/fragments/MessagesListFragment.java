@@ -29,10 +29,15 @@ import com.dcalabrese22.dan.chatter.R;
 import com.dcalabrese22.dan.chatter.helpers.RecyclerItemClickListener;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.dcalabrese22.dan.chatter.interfaces.OnRecyclerItemClickListener;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,14 +46,13 @@ import java.util.Iterator;
 public class MessagesListFragment extends Fragment {
 
     private String mUserId;
-    private MultiSelectFirebaseRecyclerAdapter mAdapter;
+    private FirebaseRecyclerAdapter mAdapter;
     private MessageExtrasListener mListener;
     private boolean mIsMultiSelectMode = false;
     private RecyclerView mRecyclerView;
     private ActionMode mActionMode;
     private ArrayList<SelectedConversation> mSelectedConversations = new ArrayList<>();
     private ArrayList<Conversation> mSelectedPbConversations = new ArrayList<>();
-    public static final String SHARED_PREF = "shared_pref_conversation";
 
     public MessagesListFragment() {
         // Required empty public constructor
@@ -67,7 +71,7 @@ public class MessagesListFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_messages_list, container, false);
 
-        ProgressBar progressBar = rootView.findViewById(R.id.progress_loading_messages);
+        final ProgressBar progressBar = rootView.findViewById(R.id.progress_loading_messages);
         progressBar.setVisibility(View.VISIBLE);
         final FloatingActionButton fab = rootView.findViewById(R.id.message_list_fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -88,17 +92,36 @@ public class MessagesListFragment extends Fragment {
         mUserId = user.getUid();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference conversationRef = reference.child("conversations");
-
-        conversationRef.orderByChild("timeStamp");
+        DatabaseReference conversationRef = reference.child("conversations")
+                .child(mUserId);
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
-        mAdapter = new MultiSelectFirebaseRecyclerAdapter(
-                Conversation.class,
-                R.layout.conversation,
-                ConversationViewHolder.class,
-                reference, progressBar);
 
+        mAdapter = new FirebaseRecyclerAdapter<Conversation, ConversationViewHolder>(
+                Conversation.class,
+                R.layout.fragment_messages_list,
+                ConversationViewHolder.class,
+                conversationRef
+        ) {
+            @Override
+            public ConversationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.conversation, parent, false);
+                return new ConversationViewHolder(view);
+            }
+
+            @Override
+            protected void populateViewHolder(ConversationViewHolder viewHolder, Conversation model, int position) {
+                viewHolder.setLastMessage(model.getLastMessage());
+                viewHolder.setUser(model.getUser2());
+            }
+
+            @Override
+            public void onDataChanged() {
+                super.onDataChanged();
+                progressBar.setVisibility(View.INVISIBLE);
+            }
+        };
 
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), mRecyclerView,
                 new OnRecyclerItemClickListener() {
@@ -108,7 +131,11 @@ public class MessagesListFragment extends Fragment {
                         if (mIsMultiSelectMode) {
                             multiSelect(view, position);
                         } else {
-                            Conversation itemClicked = mAdapter.getItem(position);
+                            Conversation itemClicked = (Conversation) mAdapter.getItem(position);
+                            String conversationId = itemClicked.getConversationId();
+
+                            mListener.getConversationId(conversationId);
+
                         }
                     }
 
@@ -202,7 +229,7 @@ public class MessagesListFragment extends Fragment {
     public void multiSelect(View view, int position) {
         ConversationViewHolder viewHolder = (ConversationViewHolder) mRecyclerView
                 .getChildViewHolder(view);
-        Conversation selected = mAdapter.getItem(position);
+        Conversation selected = (Conversation) mAdapter.getItem(position);
         SelectedConversation selectedConversation = new SelectedConversation(view, viewHolder,
                 position, selected);
         if (mActionMode != null) {

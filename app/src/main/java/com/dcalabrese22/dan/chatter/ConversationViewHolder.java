@@ -29,11 +29,11 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
 
     public ConversationViewHolder(View view) {
         super(view);
-        mAvatar = (ImageView) view.findViewById(R.id.user_avatar);
-        mSubject = (TextView) view.findViewById(R.id.tv_conversation_subject);
-        mUser = (TextView) view.findViewById(R.id.tv_conversation_user);
-        mLastMessage = (TextView) view.findViewById(R.id.tv_conversation_last_message);
-        mLinearLayout = (LinearLayout) view.findViewById(R.id.conversation_top);
+        mAvatar = view.findViewById(R.id.user_avatar);
+        mSubject = view.findViewById(R.id.tv_conversation_subject);
+        mUser = view.findViewById(R.id.tv_conversation_user);
+        mLastMessage = view.findViewById(R.id.tv_conversation_last_message);
+        mLinearLayout = view.findViewById(R.id.conversation_top);
 
 //        view.setOnLongClickListener(new View.OnLongClickListener() {
 //            @Override

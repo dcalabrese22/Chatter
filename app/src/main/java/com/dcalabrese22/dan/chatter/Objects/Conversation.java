@@ -11,16 +11,26 @@ public class Conversation {
     private Long timeStamp;
     private String user1;
     private String user2;
+    private String conversationId;
 
     public Conversation() {}
 
     public Conversation(String lastMessage, String lastMessageType, Long timeStamp, String user1,
-                        String user2) {
+                        String user2, String conversationId) {
         this.lastMessage = lastMessage;
         this.lastMessageType = lastMessageType;
         this.timeStamp = timeStamp;
         this.user1 = user1;
         this.user2 = user2;
+        this.conversationId = conversationId;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     public String getUser1() {

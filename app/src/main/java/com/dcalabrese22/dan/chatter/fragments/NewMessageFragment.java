@@ -94,13 +94,14 @@ public class NewMessageFragment extends Fragment {
                 Toast.makeText(getContext(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
             } else {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                final DatabaseReference conversationRef = reference.child("conversations").push();
-                String pushKey = conversationRef.getKey();
-                Log.d("pushKey", pushKey);
-                final DatabaseReference messagesRef = reference.child("messages")
-                        .child(pushKey).push();
                 final Long timeStamp = new Date().getTime();
                 String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                final DatabaseReference conversationRef = reference.child("conversations")
+                        .child(currentUserId)
+                        .push();
+                final String pushKey = conversationRef.getKey();
+                final DatabaseReference messagesRef = reference.child("messages")
+                        .child(pushKey).push();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
                         .child("users")
                         .child(currentUserId);
@@ -111,7 +112,7 @@ public class NewMessageFragment extends Fragment {
                         String user1 = currentUser.getUserName();
                         String user2 = mName.getText().toString();
                         Conversation conversation = new Conversation(mBody.getText().toString(),
-                                "sent", timeStamp, user1, user2);
+                                "sent", timeStamp, user1, user2, pushKey);
                         conversationRef.setValue(conversation);
                         ChatMessage message = new ChatMessage(mBody.getText().toString(),
                                 user1, timeStamp);

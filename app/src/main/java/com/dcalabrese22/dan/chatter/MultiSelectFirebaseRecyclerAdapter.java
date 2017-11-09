@@ -1,16 +1,11 @@
 package com.dcalabrese22.dan.chatter;
 
-import android.content.Context;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
-import com.dcalabrese22.dan.chatter.Objects.SelectedConversation;
-import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
-
-import java.util.ArrayList;
 
 /**
  * Created by dan on 10/8/17.
@@ -20,8 +15,10 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
 
     private ProgressBar mBar;
 
-    public MultiSelectFirebaseRecyclerAdapter(Class model, int layout,
-                                              Class viewHolder, DatabaseReference reference,
+    public MultiSelectFirebaseRecyclerAdapter(Class model,
+                                              int layout,
+                                              Class viewHolder,
+                                              DatabaseReference reference,
                                               ProgressBar bar) {
         super(model, layout, viewHolder, reference);
         mBar = bar;
@@ -29,14 +26,13 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
 
     @Override
     protected void populateViewHolder(ConversationViewHolder viewHolder, Conversation model, int position) {
-
         viewHolder.setLastMessage(model.getLastMessage());
 
     }
 
 
 
-//    @Override
+    //    @Override
 //    public ConversationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //        ConversationViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
 //        viewHolder.setOnClickListener(new ConversationClickListener() {

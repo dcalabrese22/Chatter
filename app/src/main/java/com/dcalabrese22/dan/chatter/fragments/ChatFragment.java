@@ -19,6 +19,7 @@ import android.widget.EditText;
 import com.dcalabrese22.dan.chatter.ChatViewHolder;
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
+import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,6 +51,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         mMessagePushKey = getArguments().getString(MainActivity.MESSAGE_PUSH_KEY);
+        Log.d("message push key", mMessagePushKey);
         super.onAttach(context);
 
     }
@@ -106,59 +108,34 @@ public class ChatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                final DatabaseReference messagRef = reference.child("messages").child(mMessagePushKey);
-                Query lastIdQuery = messagRef.orderByKey().limitToLast(1);
+                final DatabaseReference messageRef = reference.child("messages").child(mMessagePushKey);
                 final DatabaseReference conversationRef = reference.child("conversations").child(FirebaseAuth
                         .getInstance().getCurrentUser().getUid());
-                ValueEventListener valueEventListener = new ValueEventListener() {
+                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference userRef = reference.child("users").child(currentUserId);
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            ChatMessage message = snapshot.getValue(ChatMessage.class);
+                        User currentUser = dataSnapshot.getValue(User.class);
+                        String userName = currentUser.getUserName();
+                        String body = reply.getText().toString();
+                        Long timeStamp = new Date().getTime();
+                        ChatMessage message = new ChatMessage(body, userName, timeStamp);
+                        messageRef.push().setValue(message);
+                        reply.getText().clear();
 
-                            final String body = reply.getText().toString();
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            String name = user.getEmail().split("@")[0];
-                            Log.d("User name: ", name);
-                            Date now = Calendar.getInstance().getTime();
-                            Long timeStamp = new Date().getTime();
-                            Log.d("Now: ", now.toString());
-
-                            Map<String, Object> m = new HashMap<>();
-
-                            messagRef.updateChildren(m);
-                            reply.getText().clear();
-                            DatabaseReference pushKeyRef = reference.child("pushKeys")
-                                    .child(mMessagePushKey);
-                            pushKeyRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    String pushKey = dataSnapshot.getValue(String.class);
-                                    Log.d("pushKey: ", pushKey);
-                                    conversationRef.child(pushKey).child("lastMessage").setValue(body);
-                                    conversationRef.child(pushKey).child("lastMessageType").setValue("sent");
-
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-
-
-                        }
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("lastMessage", body);
+                        map.put("lastMessageType", "sent");
+                        map.put("timeStamp", timeStamp);
+                        conversationRef.child(mMessagePushKey).updateChildren(map);
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
-                };
-
-                lastIdQuery.addListenerForSingleValueEvent(valueEventListener);
-
-
+                });
 
 
             }
@@ -189,15 +166,38 @@ public class ChatFragment extends Fragment {
 
             }
 
-//            @Override
-//            public int getItemViewType(int position) {
-//                ChatMessage message = getItem(position);
-//                if (message.getType().equals("sent")) {
-//                    return VIEWTYPE_OUTGOING;
-//                } else {
-//                    return VIEWTYPE_INCOMING;
-//                }
-//            }
+            @Override
+            public int getItemViewType(int position) {
+                final StringBuilder messageType = new StringBuilder();
+                final ChatMessage message = getItem(position);
+                final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
+                        .child("users")
+                        .child(userId);
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User currentUser = dataSnapshot.getValue(User.class);
+                        String userName = currentUser.getUserName();
+                        if (message.getSender().equals(userName)) {
+                            messageType.append("sent");
+                        } else {
+                            messageType.append("received");
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                if (messageType.toString().equals("sent")) {
+                    return VIEWTYPE_OUTGOING;
+                } else {
+                    return VIEWTYPE_INCOMING;
+                }
+            }
 
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

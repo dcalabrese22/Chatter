@@ -18,20 +18,13 @@ import java.util.ArrayList;
 
 public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<Conversation, ConversationViewHolder> {
 
-    private Context mContext;
-    private MessageExtrasListener mListener;
     private ProgressBar mBar;
-    private ArrayList<SelectedConversation> mSelectedConversations;
 
-    public MultiSelectFirebaseRecyclerAdapter(Context context, Class model, int layout,
+    public MultiSelectFirebaseRecyclerAdapter(Class model, int layout,
                                               Class viewHolder, DatabaseReference reference,
-                                              MessageExtrasListener listener, ProgressBar bar,
-                                              ArrayList<SelectedConversation> selected) {
+                                              ProgressBar bar) {
         super(model, layout, viewHolder, reference);
-        mContext = context;
-        mListener = listener;
         mBar = bar;
-        mSelectedConversations = selected;
     }
 
     @Override
@@ -40,6 +33,8 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
         viewHolder.setLastMessage(model.getLastMessage());
 
     }
+
+
 
 //    @Override
 //    public ConversationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -58,8 +53,8 @@ public class MultiSelectFirebaseRecyclerAdapter extends FirebaseRecyclerAdapter<
 //
 //        return viewHolder;
 //    }
-
-
+//
+//
 //    @Override
 //    public void onBindViewHolder(ConversationViewHolder viewHolder, int position) {
 //        if (mSelectedConversations.contains(getItem(position))) {

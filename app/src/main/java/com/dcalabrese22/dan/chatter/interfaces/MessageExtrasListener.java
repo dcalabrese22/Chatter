@@ -6,6 +6,5 @@ package com.dcalabrese22.dan.chatter.interfaces;
 
 public interface MessageExtrasListener {
 
-    void sendMessageId(String id);
-    void getMessageUser(String user);
+    void getConversationId(String id);
 }

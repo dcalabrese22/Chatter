@@ -38,7 +38,7 @@ import java.util.Map;
 
 public class ChatFragment extends Fragment {
 
-    private String mMessageId;
+    private String mMessagePushKey;
     private String mCorrespondent;
     private FirebaseRecyclerAdapter<ChatMessage, RecyclerView.ViewHolder> mAdapter;
 
@@ -49,8 +49,7 @@ public class ChatFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        mMessageId = getArguments().getString(MainActivity.MESSAGE_ID_KEY);
-        mCorrespondent = getArguments().getString(MainActivity.MESSAGE_USER_KEY);
+        mMessagePushKey = getArguments().getString(MainActivity.MESSAGE_PUSH_KEY);
         super.onAttach(context);
 
     }
@@ -101,13 +100,13 @@ public class ChatFragment extends Fragment {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child("messages")
-                .child(mMessageId);
+                .child(mMessagePushKey);
 
         mButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-                final DatabaseReference messagRef = reference.child("messages").child(mMessageId);
+                final DatabaseReference messagRef = reference.child("messages").child(mMessagePushKey);
                 Query lastIdQuery = messagRef.orderByKey().limitToLast(1);
                 final DatabaseReference conversationRef = reference.child("conversations").child(FirebaseAuth
                         .getInstance().getCurrentUser().getUid());
@@ -130,7 +129,7 @@ public class ChatFragment extends Fragment {
                             messagRef.updateChildren(m);
                             reply.getText().clear();
                             DatabaseReference pushKeyRef = reference.child("pushKeys")
-                                    .child(mMessageId);
+                                    .child(mMessagePushKey);
                             pushKeyRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {

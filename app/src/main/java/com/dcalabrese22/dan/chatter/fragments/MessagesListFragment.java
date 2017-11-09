@@ -93,9 +93,11 @@ public class MessagesListFragment extends Fragment {
         conversationRef.orderByChild("timeStamp");
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
-        mAdapter = new MultiSelectFirebaseRecyclerAdapter(context, Conversation.class,
-                R.layout.conversation, ConversationViewHolder.class,
-                reference, mListener, progressBar, mSelectedConversations);
+        mAdapter = new MultiSelectFirebaseRecyclerAdapter(
+                Conversation.class,
+                R.layout.conversation,
+                ConversationViewHolder.class,
+                reference, progressBar);
 
 
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), mRecyclerView,

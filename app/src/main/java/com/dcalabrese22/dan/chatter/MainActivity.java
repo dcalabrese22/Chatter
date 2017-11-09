@@ -19,9 +19,8 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 public class MainActivity extends AppCompatActivity implements MessageExtrasListener {
 
-    public static final String MESSAGE_ID_KEY = "message_id_key";
-    public static final String MESSAGE_USER_KEY = "message_user_key";
     private String mCorrespondent;
+    public static final String MESSAGE_PUSH_KEY = "message_push_key";
 
 
 
@@ -47,22 +46,15 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
     }
 
     @Override
-    public void sendMessageId(String id) {
-        Log.d("MESSAGE ID: ", id);
-        ChatFragment fragment = new ChatFragment();
+    public void getConversationId(String id) {
         Bundle bundle = new Bundle();
-        bundle.putString(MESSAGE_ID_KEY, id);
-        bundle.putString(MESSAGE_USER_KEY, mCorrespondent);
+        bundle.putString(MESSAGE_PUSH_KEY, id);
+        ChatFragment fragment = new ChatFragment();
         fragment.setArguments(bundle);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    @Override
-    public void getMessageUser(String user) {
-        mCorrespondent = user;
     }
 
     @Override

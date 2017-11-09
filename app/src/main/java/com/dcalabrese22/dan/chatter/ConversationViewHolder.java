@@ -10,6 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.dcalabrese22.dan.chatter.helpers.GlideApp;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -25,7 +28,7 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
     private TextView mUser;
     private TextView mLastMessage;
     private ImageView mAvatar;
-    LinearLayout mLinearLayout;
+    private LinearLayout mLinearLayout;
 
     public ConversationViewHolder(View view) {
         super(view);
@@ -34,16 +37,6 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
         mUser = view.findViewById(R.id.tv_conversation_user);
         mLastMessage = view.findViewById(R.id.tv_conversation_last_message);
         mLinearLayout = view.findViewById(R.id.conversation_top);
-
-//        view.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-////                flipAvatar(v);
-//                return true;
-//            }
-//
-//        });
-
     }
 
     public void flipAvatar(View v) {
@@ -140,10 +133,10 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
         mLastMessage.setText(message);
     }
 
-    public void setAvatar(String urlToImage, Context context) {
+    public void setAvatar(Context context, StorageReference reference) {
+        GlideApp.with(context)
+                .load(reference)
+                .into(mAvatar);
 
-        if (urlToImage != null || !urlToImage.equals("null")) {
-            Picasso.with(context).load(urlToImage).into(mAvatar);
-        }
     }
 }

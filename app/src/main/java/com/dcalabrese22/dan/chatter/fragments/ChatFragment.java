@@ -18,6 +18,7 @@ import android.widget.EditText;
 import com.dcalabrese22.dan.chatter.ChatViewHolder;
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
+import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -111,7 +112,7 @@ public class ChatFragment extends Fragment {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                 final DatabaseReference messageRef = reference.child("messages").child(mMessagePushKey);
                 final DatabaseReference conversationRef = reference.child("conversations");
-                String user1Id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                final String user1Id = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 final DatabaseReference user1Ref = conversationRef.child(user1Id);
 
                 DatabaseReference userRef = reference.child("users").child(user1Id);
@@ -139,11 +140,9 @@ public class ChatFragment extends Fragment {
                         DatabaseReference user2ConversationRef = reference.child("conversations")
                                 .child(user2Key)
                                 .child(mMessagePushKey);
-                        Map<String, Object> user2Map = new HashMap<>();
-                        user2Map.put("lastMessage", body);
-                        user2Map.put("lastMessageType", "received");
-                        user2Map.put("timeStamp", timeStamp);
-                        user2ConversationRef.updateChildren(user2Map);
+                        Conversation forUser2 = new Conversation(body, "received", timeStamp,
+                                mUser2Name, mUserName, mMessagePushKey);
+                        user2ConversationRef.setValue(forUser2);
                     }
 
                     @Override

@@ -174,7 +174,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         StorageReference storageReference = storage.getReference();
         StorageReference imagesRef = storageReference.child("images");
         StorageReference userImageRef = imagesRef
-                .child(mAuth.getCurrentUser().getEmail())
+                .child(mAuth.getCurrentUser().getUid())
                 .child("avatar.jpg");
         if (dataArray != null) {
             UploadTask uploadTask = userImageRef.putBytes(dataArray);

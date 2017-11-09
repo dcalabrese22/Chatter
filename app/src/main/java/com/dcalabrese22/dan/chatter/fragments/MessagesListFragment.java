@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +25,7 @@ import com.dcalabrese22.dan.chatter.ConversationViewHolder;
 import com.dcalabrese22.dan.chatter.MultiSelectFirebaseRecyclerAdapter;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.SelectedConversation;
+import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.PbAppWidget;
 import com.dcalabrese22.dan.chatter.R;
 import com.dcalabrese22.dan.chatter.helpers.RecyclerItemClickListener;
@@ -32,12 +34,15 @@ import com.dcalabrese22.dan.chatter.interfaces.OnRecyclerItemClickListener;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,13 +51,16 @@ import java.util.Iterator;
 public class MessagesListFragment extends Fragment {
 
     private String mUserId;
+    private Context mContext;
+    private String mUser2;
+
     private FirebaseRecyclerAdapter mAdapter;
     private MessageExtrasListener mListener;
     private boolean mIsMultiSelectMode = false;
     private RecyclerView mRecyclerView;
     private ActionMode mActionMode;
     private ArrayList<SelectedConversation> mSelectedConversations = new ArrayList<>();
-    private ArrayList<Conversation> mSelectedPbConversations = new ArrayList<>();
+    private ArrayList<Conversation> mConversationsSelected = new ArrayList<>();
 
     public MessagesListFragment() {
         // Required empty public constructor
@@ -69,7 +77,9 @@ public class MessagesListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_messages_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_messages_list, container,
+                false);
+        mContext = getContext();
 
         final ProgressBar progressBar = rootView.findViewById(R.id.progress_loading_messages);
         progressBar.setVisibility(View.VISIBLE);
@@ -86,12 +96,12 @@ public class MessagesListFragment extends Fragment {
             }
         });
 
-        final Context context = getContext();
-
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mUserId = user.getUid();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+
+        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         DatabaseReference conversationRef = reference.child("conversations")
                 .child(mUserId);
 
@@ -111,9 +121,54 @@ public class MessagesListFragment extends Fragment {
             }
 
             @Override
-            protected void populateViewHolder(ConversationViewHolder viewHolder, Conversation model, int position) {
+            protected void populateViewHolder(final ConversationViewHolder viewHolder,
+                                              Conversation model, int position) {
                 viewHolder.setLastMessage(model.getLastMessage());
                 viewHolder.setUser(model.getUser2());
+                final FirebaseStorage storage = FirebaseStorage.getInstance();
+
+
+                reference.child("users").orderByChild("userName").equalTo(mUser2)
+                        .addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                String userId = dataSnapshot.getKey();
+                                Log.d("userId", userId);
+                                User user2 = dataSnapshot.getValue(User.class);
+                                String user2Email = user2.getEmail();
+                                Boolean hasUserImage = user2.getHasUserImage();
+                                if (hasUserImage) {
+                                    StorageReference storageImagesRef =
+                                            storage.getReference("images/" + userId +
+                                                    "/avatar.jpg");
+                                    Log.d("image ref", storageImagesRef.toString());
+                                    viewHolder.setAvatar(mContext, storageImagesRef);
+                                } else {
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
             }
 
             @Override
@@ -133,9 +188,9 @@ public class MessagesListFragment extends Fragment {
                         } else {
                             Conversation itemClicked = (Conversation) mAdapter.getItem(position);
                             String conversationId = itemClicked.getConversationId();
-                            String user2 = itemClicked.getUser2();
+                            mUser2 = itemClicked.getUser2();
 
-                            mListener.getMessageExtras(conversationId, user2);
+                            mListener.getMessageExtras(conversationId, mUser2);
 
                         }
                     }
@@ -159,7 +214,6 @@ public class MessagesListFragment extends Fragment {
         mRecyclerView.setLayoutManager(ll);
         ll.setReverseLayout(true);
         mRecyclerView.setAdapter(mAdapter);
-
 
         return rootView;
     }
@@ -193,13 +247,12 @@ public class MessagesListFragment extends Fragment {
                 case R.id.action_delete:
                     Toast.makeText(getContext(), "Removed", Toast.LENGTH_SHORT).show();
                     for (SelectedConversation selectedConversation : mSelectedConversations) {
+                        String selectedId = selectedConversation.getConversation().getConversationId();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                                 .child("conversations")
-                                .child(mUserId);
-
-                        DatabaseReference messageRef = FirebaseDatabase.getInstance().getReference()
-                                .child("messages");
-
+                                .child(mUserId)
+                                .child(selectedId);
+                        reference.removeValue();
 
                         Intent intent = new Intent(getContext(), PbAppWidget.class);
                         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
@@ -234,10 +287,10 @@ public class MessagesListFragment extends Fragment {
         SelectedConversation selectedConversation = new SelectedConversation(view, viewHolder,
                 position, selected);
         if (mActionMode != null) {
-            if (mSelectedPbConversations.contains(selected)) {
+            if (mConversationsSelected.contains(selected)) {
                 viewHolder.flipAvatar(view);
                 view.setActivated(false);
-                mSelectedPbConversations.remove(selected);
+                mConversationsSelected.remove(selected);
                 for (Iterator<SelectedConversation> i = mSelectedConversations.listIterator(); i.hasNext();) {
                     Conversation c = i.next().getConversation();
                     if (c.equals(selected)) {
@@ -245,7 +298,7 @@ public class MessagesListFragment extends Fragment {
                     }
                 }
             } else {
-                mSelectedPbConversations.add(selected);
+                mConversationsSelected.add(selected);
                 mSelectedConversations.add(selectedConversation);
                 viewHolder.flipAvatar(view);
                 view.setActivated(true);
@@ -261,7 +314,7 @@ public class MessagesListFragment extends Fragment {
             selected.getSelectedView().setActivated(false);
         }
         mSelectedConversations.clear();
-        mSelectedPbConversations.clear();
+        mConversationsSelected.clear();
     }
 
 

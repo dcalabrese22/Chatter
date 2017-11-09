@@ -73,5 +73,13 @@ public class Conversation {
         this.timeStamp = timeStamp;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Conversation c = (Conversation) obj;
+        if (c.getConversationId().equals(conversationId)) {
+            return true;
+        }
+        return false;
+    }
 }
 

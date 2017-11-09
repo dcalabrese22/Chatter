@@ -19,6 +19,7 @@ import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -53,24 +54,25 @@ public class NewMessageFragment extends Fragment {
         mBody = rootView.findViewById(R.id.et_new_message_body);
         FloatingActionButton fab = rootView.findViewById(R.id.fab_new_message);
 
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("conversations");
-
-        final DatabaseReference uidReference = reference.child(userId);
-        final DatabaseReference messagesRef = FirebaseDatabase.getInstance().getReference("chats");
+        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference usersRef = reference.child("users");
 
         fab.setOnClickListener(new SendNewMessageListener());
 
         final List<String> autoCompleteNames = new ArrayList<>();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final String userId = user.getUid();
 
-        Query userNameQuery = reference.child(userId);
-        userNameQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Conversation conversation = snapshot.getValue(Conversation.class);
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    if (!child.getKey().equals(userId)) {
+                        User other = child.getValue(User.class);
+                        String userName = other.getUserName();
+                        autoCompleteNames.add(userName);
+                    }
                 }
             }
 
@@ -82,6 +84,8 @@ public class NewMessageFragment extends Fragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_dropdown_item_1line, autoCompleteNames);
+
+        mName.setAdapter(adapter);
 
         return rootView;
     }
@@ -109,14 +113,49 @@ public class NewMessageFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User currentUser = dataSnapshot.getValue(User.class);
-                        String user1 = currentUser.getUserName();
-                        String user2 = mName.getText().toString();
-                        Conversation conversation = new Conversation(mBody.getText().toString(),
-                                "sent", timeStamp, user1, user2, pushKey);
-                        conversationRef.setValue(conversation);
-                        ChatMessage message = new ChatMessage(mBody.getText().toString(),
-                                user1, timeStamp);
-                        messagesRef.setValue(message);
+                        final String user1 = currentUser.getUserName();
+                        final String user2 = mName.getText().toString();
+                        reference.child("users")
+                                .orderByChild("userName").equalTo(user2)
+                                .addChildEventListener(new ChildEventListener() {
+                                    @Override
+                                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                        String user2Key = dataSnapshot.getKey();
+                                        Log.d("user2Key", user2Key);
+                                        Conversation conversationFromUser1 = new Conversation(mBody.getText().toString(),
+                                                "sent", timeStamp, user1, user2, pushKey);
+                                        conversationRef.setValue(conversationFromUser1);
+                                        Conversation receivedByUser2 = new Conversation(mBody.getText().toString(),
+                                                "received", timeStamp, user2, user1, pushKey);
+                                        DatabaseReference user2ConversationRef = reference.child("conversations")
+                                                .child(user2Key).child(pushKey);
+                                        user2ConversationRef.setValue(receivedByUser2);
+                                        ChatMessage message = new ChatMessage(mBody.getText().toString(),
+                                                user1, timeStamp);
+                                        messagesRef.setValue(message);
+                                    }
+
+                                    @Override
+                                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                                    }
+
+                                    @Override
+                                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                                    }
+
+                                    @Override
+                                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+
                     }
 
                     @Override

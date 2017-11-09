@@ -133,8 +133,9 @@ public class MessagesListFragment extends Fragment {
                         } else {
                             Conversation itemClicked = (Conversation) mAdapter.getItem(position);
                             String conversationId = itemClicked.getConversationId();
+                            String user2 = itemClicked.getUser2();
 
-                            mListener.getConversationId(conversationId);
+                            mListener.getMessageExtras(conversationId, user2);
 
                         }
                     }

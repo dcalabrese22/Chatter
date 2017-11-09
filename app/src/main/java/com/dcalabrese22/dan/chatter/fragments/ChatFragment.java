@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +30,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +39,8 @@ public class ChatFragment extends Fragment {
 
     private String mMessagePushKey;
     private String mCorrespondent;
+    private String mUserName;
+    private String mUser2Name;
     private FirebaseRecyclerAdapter<ChatMessage, RecyclerView.ViewHolder> mAdapter;
 
 
@@ -51,7 +51,8 @@ public class ChatFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         mMessagePushKey = getArguments().getString(MainActivity.MESSAGE_PUSH_KEY);
-        Log.d("message push key", mMessagePushKey);
+        mUserName = getArguments().getString(MainActivity.USER_NAME);
+        mUser2Name = getArguments().getString(MainActivity.USER2_NAME);
         super.onAttach(context);
 
     }
@@ -109,26 +110,55 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                 final DatabaseReference messageRef = reference.child("messages").child(mMessagePushKey);
-                final DatabaseReference conversationRef = reference.child("conversations").child(FirebaseAuth
-                        .getInstance().getCurrentUser().getUid());
-                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DatabaseReference userRef = reference.child("users").child(currentUserId);
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User currentUser = dataSnapshot.getValue(User.class);
-                        String userName = currentUser.getUserName();
-                        String body = reply.getText().toString();
-                        Long timeStamp = new Date().getTime();
-                        ChatMessage message = new ChatMessage(body, userName, timeStamp);
-                        messageRef.push().setValue(message);
-                        reply.getText().clear();
+                final DatabaseReference conversationRef = reference.child("conversations");
+                String user1Id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                final DatabaseReference user1Ref = conversationRef.child(user1Id);
 
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("lastMessage", body);
-                        map.put("lastMessageType", "sent");
-                        map.put("timeStamp", timeStamp);
-                        conversationRef.child(mMessagePushKey).updateChildren(map);
+                DatabaseReference userRef = reference.child("users").child(user1Id);
+                final Long timeStamp = new Date().getTime();
+                Map<String, Object> map = new HashMap<>();
+                map.put("lastMessage", reply.getText().toString());
+                map.put("lastMessageType", "sent");
+                map.put("timeStamp", timeStamp);
+                user1Ref.child(mMessagePushKey).updateChildren(map);
+
+                final String body = reply.getText().toString();
+
+                ChatMessage message = new ChatMessage(body,
+                        mUserName, timeStamp);
+                messageRef.push().setValue(message);
+
+                Query user2Query = reference.child("users")
+                        .orderByChild("userName")
+                        .equalTo(mUser2Name);
+
+                user2Query.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        String user2Key = dataSnapshot.getKey();
+                        DatabaseReference user2ConversationRef = reference.child("conversations")
+                                .child(user2Key)
+                                .child(mMessagePushKey);
+                        Map<String, Object> user2Map = new HashMap<>();
+                        user2Map.put("lastMessage", body);
+                        user2Map.put("lastMessageType", "received");
+                        user2Map.put("timeStamp", timeStamp);
+                        user2ConversationRef.updateChildren(user2Map);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
                     }
 
                     @Override
@@ -137,7 +167,7 @@ public class ChatFragment extends Fragment {
                     }
                 });
 
-
+                reply.getText().clear();
             }
         });
 
@@ -168,31 +198,8 @@ public class ChatFragment extends Fragment {
 
             @Override
             public int getItemViewType(int position) {
-                final StringBuilder messageType = new StringBuilder();
                 final ChatMessage message = getItem(position);
-                final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
-                        .child("users")
-                        .child(userId);
-                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User currentUser = dataSnapshot.getValue(User.class);
-                        String userName = currentUser.getUserName();
-                        if (message.getSender().equals(userName)) {
-                            messageType.append("sent");
-                        } else {
-                            messageType.append("received");
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-                if (messageType.toString().equals("sent")) {
+                if (message.getSender().equals(mUserName)) {
                     return VIEWTYPE_OUTGOING;
                 } else {
                     return VIEWTYPE_INCOMING;

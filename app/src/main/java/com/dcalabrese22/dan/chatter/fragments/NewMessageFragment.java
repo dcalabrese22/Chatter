@@ -24,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.List;
 public class NewMessageFragment extends Fragment {
 
     AutoCompleteTextView mName;
-    EditText mSubject;
     EditText mBody;
 
 
@@ -50,7 +48,6 @@ public class NewMessageFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_new_message, container, false);
         mName = rootView.findViewById(R.id.et_new_message_to);
-        mSubject = rootView.findViewById(R.id.et_new_message_subject);
         mBody = rootView.findViewById(R.id.et_new_message_body);
         FloatingActionButton fab = rootView.findViewById(R.id.fab_new_message);
 
@@ -93,9 +90,9 @@ public class NewMessageFragment extends Fragment {
     private class SendNewMessageListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            if (mName.getText().toString().equals("") || mSubject.getText().toString().equals("")
-                    || mBody.getText().toString().equals("")) {
-                Toast.makeText(getContext(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
+            if (mName.getText().toString().equals("") || mBody.getText().toString().equals("")) {
+                Toast.makeText(getContext(), R.string.missing_fields,
+                        Toast.LENGTH_SHORT).show();
             } else {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                 final Long timeStamp = new Date().getTime();

@@ -8,6 +8,7 @@ public class WidgetListItem {
 
     private String sender;
     private String lastMessage;
+    private String conversationId;
 
     public WidgetListItem() {}
 
@@ -25,5 +26,13 @@ public class WidgetListItem {
 
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 }

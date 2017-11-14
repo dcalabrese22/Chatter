@@ -37,6 +37,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     private  DatabaseReference mReference = FirebaseDatabase.getInstance().getReference()
             .child("conversations")
             .child(mUserId);
+    public static final String WIDGET_CONVERSATION_ID_EXTRA = "widget_conversation_id_extra";
 
     public WidgetDataProvider(Context context, Intent intent) {
         mContext = context;
@@ -72,11 +73,13 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     public RemoteViews getViewAt(int position) {
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_conversation);
-
+        Intent fillInIntent = new Intent();
         WidgetListItem listItem = mWidgetListItems.get(mWidgetListItems.size()-1-position);
         view.setTextViewText(R.id.widget_conversation_last_message,
                 listItem.getLastMessage());
         view.setTextViewText(R.id.widget_conversation_user, listItem.getSender());
+        fillInIntent.putExtra(WIDGET_CONVERSATION_ID_EXTRA, listItem.getConversationId());
+        view.setOnClickFillInIntent(R.id.widget_conversation_row, fillInIntent);
 
         return view;
     }
@@ -120,6 +123,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                     Conversation conversation = child.getValue(Conversation.class);
                     widgetListItem.setSender(conversation.getUser2());
                     widgetListItem.setLastMessage(conversation.getLastMessage());
+                    widgetListItem.setConversationId(conversation.getConversationId());
                     mWidgetListItems.add(widgetListItem);
                     mLatch.countDown();
 

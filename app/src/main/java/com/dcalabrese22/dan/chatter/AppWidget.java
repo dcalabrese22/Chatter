@@ -1,9 +1,11 @@
 package com.dcalabrese22.dan.chatter;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.widget.RemoteViews;
 
 import com.dcalabrese22.dan.chatter.services.WidgetService;
@@ -13,14 +15,27 @@ import com.dcalabrese22.dan.chatter.services.WidgetService;
  */
 public class AppWidget extends AppWidgetProvider {
 
+    public static final String WIDGET_INTENT_EXTA = "widget_intent_extra";
+    public static final String NEW_MESSAGE_FRAGMENT_VALUE = "new_message_fragment";
+    public static final String CONVERSATION_FRAGMENT_VALUE = "conversation_fragment";
+    private String mConversationId;
+
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
+        Intent newMessageIntent = new Intent(context, MainActivity.class);
+        newMessageIntent.setData(Uri.parse(newMessageIntent.toUri(Intent.URI_INTENT_SCHEME)));
+        newMessageIntent.putExtra(WIDGET_INTENT_EXTA,  NEW_MESSAGE_FRAGMENT_VALUE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                newMessageIntent, 0);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-
+        views.setOnClickPendingIntent(R.id.widget_new_message, pendingIntent);
         setRemoteAdapter(context, views);
         // Instruct the widget manager to update the widget
+
+        Intent chatIntent = new Intent(context, MainActivity.class);
+        
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
@@ -46,6 +61,14 @@ public class AppWidget extends AppWidgetProvider {
     private static void setRemoteAdapter(Context context, RemoteViews views) {
         views.setRemoteAdapter(R.id.lv_widget_conversations,
                 new Intent(context, WidgetService.class));
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        mConversationId = intent
+                .getStringExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA);
+
+        super.onReceive(context, intent);
     }
 }
 

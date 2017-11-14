@@ -34,7 +34,10 @@ public class AppWidget extends AppWidgetProvider {
         setRemoteAdapter(context, views);
         // Instruct the widget manager to update the widget
 
-        Intent chatIntent = new Intent(context, MainActivity.class);
+//        Intent chatIntent = new Intent(context, MainActivity.class);
+//        PendingIntent chatPendingIntent = PendingIntent.getBroadcast(context, 0,
+//                chatIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        views.setPendingIntentTemplate(R.id.lv_widget_conversations, chatPendingIntent);
         
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
@@ -67,6 +70,9 @@ public class AppWidget extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         mConversationId = intent
                 .getStringExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA);
+        Intent chatIntent = new Intent(context, MainActivity.class);
+        chatIntent.putExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA, mConversationId);
+        context.startActivity(chatIntent);
 
         super.onReceive(context, intent);
     }

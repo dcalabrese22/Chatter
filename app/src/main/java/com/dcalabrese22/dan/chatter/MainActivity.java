@@ -8,10 +8,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.fragments.ChatFragment;
 import com.dcalabrese22.dan.chatter.fragments.MessagesListFragment;
-import com.dcalabrese22.dan.chatter.fragments.NewMessageFragment;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,56 +28,85 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
     public static final String USER_NAME = "user_name";
     public static final String USER2_NAME = "user2_name";
     private String mUserName;
-
-
+    private String mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .child(mUserId);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                mUserName = user.getUserName();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Intent launchedIntent = getIntent();
         String launchedIntentValue = launchedIntent.getStringExtra(AppWidget.WIDGET_INTENT_EXTA);
-        if (launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
-            NewMessageFragment newMessageFragment = new NewMessageFragment();
-            transaction.add(R.id.fragment_container, newMessageFragment).commit();
-        }else if (launchedIntentValue.equals(AppWidget.CONVERSATION_FRAGMENT_VALUE)) {
-            ChatFragment chatFragment = new ChatFragment();
-            transaction.add(R.id.fragment_container, chatFragment).commit();
-
-        }
-        else {
+//        if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
+//                launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
+//            NewMessageFragment newMessageFragment = new NewMessageFragment();
+//            transaction.add(R.id.fragment_container, newMessageFragment).commit();
+//        }else if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
+//                launchedIntentValue.equals(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA)) {
+//            getCorrespondentAndStartChat(launchedIntentValue);
+//        }
+//        else {
 
             MessagesListFragment fragment = new MessagesListFragment();
             transaction.add(R.id.fragment_container, fragment)
                     .commit();
 
             String refreshToken = FirebaseInstanceId.getInstance().getToken();
-            final String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             DatabaseReference tokenRef = FirebaseDatabase.getInstance().getReference();
 
-            tokenRef.child("RefreshTokens").child(userId).child(refreshToken).setValue(true);
-
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                    .child("users")
-                    .child(userId);
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
-                    mUserName = user.getUserName();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
+            tokenRef.child("RefreshTokens").child(mUserId).child(refreshToken).setValue(true);
 
         }
+//    }
 
+    public void getCorrespondentAndStartChat(final String messageId) {
 
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child("conversations")
+                .child(mUserId)
+                .child(messageId);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Conversation conversation = dataSnapshot.getValue(Conversation.class);
+                String user2 = conversation.getUser2();
+                Bundle bundle = new Bundle();
+                bundle.putString(MESSAGE_PUSH_KEY, messageId);
+                bundle.putString(USER_NAME, mUserName);
+                bundle.putString(USER2_NAME, user2);
+                launchChatFragment(bundle);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void launchChatFragment(Bundle bundle) {
+        ChatFragment fragment = new ChatFragment();
+        fragment.setArguments(bundle);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     @Override
@@ -86,12 +115,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         bundle.putString(MESSAGE_PUSH_KEY, id);
         bundle.putString(USER_NAME, mUserName);
         bundle.putString(USER2_NAME, user2);
-        ChatFragment fragment = new ChatFragment();
-        fragment.setArguments(bundle);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, fragment)
-                .addToBackStack(null)
-                .commit();
+        launchChatFragment(bundle);
     }
 
     @Override

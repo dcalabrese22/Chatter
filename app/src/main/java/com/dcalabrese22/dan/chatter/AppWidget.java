@@ -11,7 +11,7 @@ import com.dcalabrese22.dan.chatter.services.WidgetService;
 /**
  * Implementation of App Widget functionality.
  */
-public class PbAppWidget extends AppWidgetProvider {
+public class AppWidget extends AppWidgetProvider {
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {

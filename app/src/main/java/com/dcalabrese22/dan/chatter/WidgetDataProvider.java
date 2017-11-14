@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by dan on 10/9/17.
@@ -40,7 +41,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     public WidgetDataProvider(Context context, Intent intent) {
         mContext = context;
         mManager = AppWidgetManager.getInstance(mContext);
-        mWidgetIds = mManager.getAppWidgetIds(new ComponentName(mContext.getPackageName(), PbAppWidget.class.getName()));
+        mWidgetIds = mManager.getAppWidgetIds(new ComponentName(mContext.getPackageName(), AppWidget.class.getName()));
 
     }
 
@@ -72,7 +73,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_conversation);
 
-        WidgetListItem listItem = mWidgetListItems.get(mWidgetListItems.size()-position);
+        WidgetListItem listItem = mWidgetListItems.get(mWidgetListItems.size()-1-position);
         view.setTextViewText(R.id.widget_conversation_last_message,
                 listItem.getLastMessage());
         view.setTextViewText(R.id.widget_conversation_user, listItem.getSender());
@@ -110,7 +111,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     public void populateWidgetListView() throws InterruptedException {
         mWidgetListItems.clear();
-        mLatch = new CountDownLatch(1);
+        mLatch = new CountDownLatch(10);
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -121,6 +122,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                     widgetListItem.setLastMessage(conversation.getLastMessage());
                     mWidgetListItems.add(widgetListItem);
                     mLatch.countDown();
+
                 }
             }
 
@@ -129,6 +131,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                 mLatch.countDown();
             }
         });
-        mLatch.await();
+        mLatch.await(7, TimeUnit.SECONDS);
     }
 }

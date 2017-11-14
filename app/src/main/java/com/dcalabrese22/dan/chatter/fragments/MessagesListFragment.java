@@ -22,11 +22,10 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.dcalabrese22.dan.chatter.ConversationViewHolder;
-import com.dcalabrese22.dan.chatter.MultiSelectFirebaseRecyclerAdapter;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.SelectedConversation;
 import com.dcalabrese22.dan.chatter.Objects.User;
-import com.dcalabrese22.dan.chatter.PbAppWidget;
+import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.R;
 import com.dcalabrese22.dan.chatter.helpers.RecyclerItemClickListener;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
@@ -39,8 +38,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -254,12 +251,12 @@ public class MessagesListFragment extends Fragment {
                                 .child(selectedId);
                         reference.removeValue();
 
-                        Intent intent = new Intent(getContext(), PbAppWidget.class);
+                        Intent intent = new Intent(getContext(), AppWidget.class);
                         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
                         AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
                         int[] ids = manager.getAppWidgetIds(new ComponentName(getContext()
-                                .getPackageName(), PbAppWidget.class.getName()));
+                                .getPackageName(), AppWidget.class.getName()));
                         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
                         getActivity().sendBroadcast(intent);
 

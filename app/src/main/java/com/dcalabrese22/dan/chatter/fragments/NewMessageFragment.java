@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.User;
-import com.dcalabrese22.dan.chatter.PbAppWidget;
+import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -166,7 +166,7 @@ public class NewMessageFragment extends Fragment {
             }
             getActivity().getSupportFragmentManager().popBackStack();
             AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
-            int[] widgetIds = manager.getAppWidgetIds(new ComponentName(getContext().getPackageName(), PbAppWidget.class.getName()));
+            int[] widgetIds = manager.getAppWidgetIds(new ComponentName(getContext().getPackageName(), AppWidget.class.getName()));
             manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.lv_widget_conversations);
         }
     }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,6 +13,7 @@ import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.fragments.ChatFragment;
 import com.dcalabrese22.dan.chatter.fragments.MessagesListFragment;
+import com.dcalabrese22.dan.chatter.fragments.NewMessageFragment;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -53,15 +55,18 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Intent launchedIntent = getIntent();
         String launchedIntentValue = launchedIntent.getStringExtra(AppWidget.WIDGET_INTENT_EXTA);
-//        if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
-//                launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
-//            NewMessageFragment newMessageFragment = new NewMessageFragment();
-//            transaction.add(R.id.fragment_container, newMessageFragment).commit();
-//        }else if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
-//                launchedIntentValue.equals(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA)) {
-//            getCorrespondentAndStartChat(launchedIntentValue);
-//        }
-//        else {
+        if (launchedIntentValue != null) {
+            Log.d("launchedIntentValue:", launchedIntentValue);
+        }
+        if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
+                launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
+            NewMessageFragment newMessageFragment = new NewMessageFragment();
+            transaction.add(R.id.fragment_container, newMessageFragment).commit();
+        }else if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
+                launchedIntentValue.equals(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA)) {
+            getCorrespondentAndStartChat(launchedIntentValue);
+        }
+        else {
 
             MessagesListFragment fragment = new MessagesListFragment();
             transaction.add(R.id.fragment_container, fragment)
@@ -73,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
             tokenRef.child("RefreshTokens").child(mUserId).child(refreshToken).setValue(true);
 
         }
-//    }
+    }
 
     public void getCorrespondentAndStartChat(final String messageId) {
 

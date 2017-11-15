@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -74,11 +75,18 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_conversation);
         Intent fillInIntent = new Intent();
+        fillInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         WidgetListItem listItem = mWidgetListItems.get(mWidgetListItems.size()-1-position);
         view.setTextViewText(R.id.widget_conversation_last_message,
                 listItem.getLastMessage());
         view.setTextViewText(R.id.widget_conversation_user, listItem.getSender());
-        fillInIntent.putExtra(WIDGET_CONVERSATION_ID_EXTRA, listItem.getConversationId());
+        SharedPreferences sharedPreferences = mContext
+                .getSharedPreferences
+                        (mContext.getString(R.string.shared_preferences),
+                                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(mContext.getString(R.string.preference_conversation_id),
+                listItem.getConversationId()).commit();
         view.setOnClickFillInIntent(R.id.widget_conversation_row, fillInIntent);
 
         return view;

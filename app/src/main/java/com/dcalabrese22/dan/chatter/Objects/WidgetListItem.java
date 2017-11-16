@@ -12,6 +12,12 @@ public class WidgetListItem {
 
     public WidgetListItem() {}
 
+    public WidgetListItem(String sender, String lastMessage, String conversationId) {
+        this.sender = sender;
+        this.lastMessage = lastMessage;
+        this.conversationId = conversationId;
+    }
+
     public String getSender() {
         return sender;
     }

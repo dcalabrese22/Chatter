@@ -46,7 +46,4 @@
     <string name="prompt_image">Image</string>
     <string name="btn_browse">Browse</string>
 
-    <string name="shared_preferences">com.dcalabrese22.dan.chatter</string>
-    <string name="preference_conversation_id">conversation_id</string>
-
 </resources>

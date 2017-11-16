@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
     public static final String USER2_NAME = "user2_name";
     private String mUserName;
     private String mUserId;
+    private boolean cameFromWidget = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,19 +55,19 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         });
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Intent launchedIntent = getIntent();
-        String launchedIntentValue = launchedIntent.getStringExtra(AppWidget.WIDGET_INTENT_EXTA);
-        if (launchedIntentValue != null) {
+
+        if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTRA)) {
+            String launchedIntentValue = launchedIntent.getStringExtra(AppWidget.WIDGET_INTENT_EXTRA);
             Log.d("launchedIntentValue:", launchedIntentValue);
-        }
-        if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
-                launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
-            NewMessageFragment newMessageFragment = new NewMessageFragment();
-            transaction.add(R.id.fragment_container, newMessageFragment).commit();
-        }else if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTA) &&
-                launchedIntentValue.equals(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA)) {
-            getCorrespondentAndStartChat(launchedIntentValue);
-        }
-        else {
+            if (launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
+                NewMessageFragment newMessageFragment = new NewMessageFragment();
+                transaction.add(R.id.fragment_container, newMessageFragment).commit();
+            } else if (launchedIntentValue.equals(WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE)) {
+                String messageId = launchedIntent.getStringExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA);
+                getCorrespondentAndStartChat(messageId);
+                cameFromWidget = true;
+            }
+        } else {
 
             MessagesListFragment fragment = new MessagesListFragment();
             transaction.add(R.id.fragment_container, fragment)
@@ -125,10 +126,10 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() != 0) {
-            getSupportFragmentManager().popBackStack();
-        } else {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0 || cameFromWidget) {
             finish();
+        } else {
+            getSupportFragmentManager().popBackStack();
         }
     }
 

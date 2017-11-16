@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -38,7 +37,9 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     private  DatabaseReference mReference = FirebaseDatabase.getInstance().getReference()
             .child("conversations")
             .child(mUserId);
-    public static final String WIDGET_CONVERSATION_ID_EXTRA = "widget_conversation_id_extra";
+
+    public static final String CONVERSATION_FRAGMENT_VALUE = "conversation_fragment";
+    public static final String WIDGET_CONVERSATION_ID_EXTRA = "conversation_id_extra";
 
     public WidgetDataProvider(Context context, Intent intent) {
         mContext = context;
@@ -75,18 +76,12 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         RemoteViews view = new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_conversation);
         Intent fillInIntent = new Intent();
-        fillInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         WidgetListItem listItem = mWidgetListItems.get(mWidgetListItems.size()-1-position);
         view.setTextViewText(R.id.widget_conversation_last_message,
                 listItem.getLastMessage());
         view.setTextViewText(R.id.widget_conversation_user, listItem.getSender());
-        SharedPreferences sharedPreferences = mContext
-                .getSharedPreferences
-                        (mContext.getString(R.string.shared_preferences),
-                                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(mContext.getString(R.string.preference_conversation_id),
-                listItem.getConversationId()).commit();
+        fillInIntent.putExtra(AppWidget.WIDGET_INTENT_EXTRA, CONVERSATION_FRAGMENT_VALUE);
+        fillInIntent.putExtra(WIDGET_CONVERSATION_ID_EXTRA, listItem.getConversationId());
         view.setOnClickFillInIntent(R.id.widget_conversation_row, fillInIntent);
 
         return view;
@@ -113,10 +108,11 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     }
 
 
-    public void makeFakeData() {
-        fakeData.clear();
+    public void makeFakeData() throws InterruptedException{
+        mWidgetListItems.clear();
         for (int i = 0; i < 10; i++) {
-            fakeData.add("ListView item " + i);
+            String value = String.valueOf(i);
+            mWidgetListItems.add(new WidgetListItem(value, value, value));
         }
     }
 

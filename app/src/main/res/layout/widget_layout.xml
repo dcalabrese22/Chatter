@@ -16,6 +16,7 @@
             android:layout_height="wrap_content"
             style="@style/TextAppearance.AppCompat.Widget.ActionBar.Title"
             android:textSize="18sp"
+            android:layout_centerVertical="true"
             android:textColor="#ffffff"
             android:background="@color/colorPrimary"
             android:text="@string/app_name"/>

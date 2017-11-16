@@ -9,6 +9,7 @@ public class WidgetListItem {
     private String sender;
     private String lastMessage;
     private String conversationId;
+    private String avatar;
 
     public WidgetListItem() {}
 
@@ -40,5 +41,13 @@ public class WidgetListItem {
 
     public void setConversationId(String conversationId) {
         this.conversationId = conversationId;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

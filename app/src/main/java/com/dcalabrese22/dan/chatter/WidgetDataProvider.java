@@ -4,17 +4,25 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
+import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.Objects.WidgetListItem;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +71,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     @Override
     public void onDestroy() {
-
+        mWidgetListItems.clear();
     }
 
     @Override
@@ -80,7 +88,11 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         view.setTextViewText(R.id.widget_conversation_last_message,
                 listItem.getLastMessage());
         view.setTextViewText(R.id.widget_conversation_user, listItem.getSender());
-        fillInIntent.putExtra(AppWidget.WIDGET_INTENT_EXTRA, CONVERSATION_FRAGMENT_VALUE);
+        try {
+            view.setImageViewBitmap(R.id.widget_user_avatar, getUser2Avatar(listItem.getSender()));
+        }catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         fillInIntent.putExtra(WIDGET_CONVERSATION_ID_EXTRA, listItem.getConversationId());
         view.setOnClickFillInIntent(R.id.widget_conversation_row, fillInIntent);
 
@@ -94,7 +106,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 2;
     }
 
     @Override
@@ -140,5 +152,62 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
             }
         });
         mLatch.await(7, TimeUnit.SECONDS);
+    }
+
+    public Bitmap getUser2Avatar(String user2) throws InterruptedException {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        final FirebaseStorage storage = FirebaseStorage.getInstance();
+        final ArrayList<Bitmap> images = new ArrayList<>();
+        mLatch = new CountDownLatch(1);
+        reference.child("users").orderByChild("userName").equalTo(user2)
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        String userId = dataSnapshot.getKey();
+                        User user2 = dataSnapshot.getValue(User.class);
+                        Boolean hasUserImage = user2.getHasUserImage();
+                        if (hasUserImage) {
+                            StorageReference storageImagesRef =
+                                    storage.getReference("images/" + userId +
+                                            "/avatar.jpg");
+                            Log.d("image ref", storageImagesRef.toString());
+                            final long ONE_MEGABYTE = 1024 * 1024;
+                            storageImagesRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    images.add(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                                    mLatch.countDown();
+                                }
+                            });
+                        } else {
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+        mLatch.await();
+        return images.get(0);
+
     }
 }

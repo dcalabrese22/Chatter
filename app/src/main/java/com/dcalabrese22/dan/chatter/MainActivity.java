@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         });
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Intent launchedIntent = getIntent();
+        Log.d("launched intent extra?",
+                String.valueOf(launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTRA)));
 
         if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTRA)) {
             String launchedIntentValue = launchedIntent.getStringExtra(AppWidget.WIDGET_INTENT_EXTRA);
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
             if (launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
                 NewMessageFragment newMessageFragment = new NewMessageFragment();
                 transaction.add(R.id.fragment_container, newMessageFragment).commit();
-            } else if (launchedIntentValue.equals(WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE)) {
+            } if (launchedIntentValue.equals(WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE)) {
                 String messageId = launchedIntent.getStringExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA);
                 getCorrespondentAndStartChat(messageId);
                 cameFromWidget = true;

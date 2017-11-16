@@ -1,7 +1,6 @@
 package com.dcalabrese22.dan.chatter;
 
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -27,22 +26,18 @@ public class AppWidget extends AppWidgetProvider {
         Intent newMessageIntent = new Intent(context, MainActivity.class);
         newMessageIntent.setData(Uri.parse(newMessageIntent.toUri(Intent.URI_INTENT_SCHEME)));
         newMessageIntent.putExtra(WIDGET_INTENT_EXTRA,  NEW_MESSAGE_FRAGMENT_VALUE);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-//                newMessageIntent, 0);
-        PendingIntent pendingIntent = TaskStackBuilder.create(context)
-                .addNextIntentWithParentStack(newMessageIntent)
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
+                newMessageIntent, 0);
         // Construct the RemoteViews object
         views.setOnClickPendingIntent(R.id.widget_new_message, pendingIntent);
         setRemoteAdapter(context, views);
         // Instruct the widget manager to update the widget
 
         Intent chatIntent = new Intent(context, MainActivity.class);
-        chatIntent.setData(Uri.parse(chatIntent.toUri(Intent.URI_INTENT_SCHEME)));
-
-        PendingIntent chatPendingIntent = TaskStackBuilder.create(context)
-                .addNextIntentWithParentStack(chatIntent)
-                .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        chatIntent.setData(Uri.parse("chatIntent"));
+        chatIntent.putExtra(WIDGET_INTENT_EXTRA, WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE);
+        PendingIntent chatPendingIntent = PendingIntent.getActivity(context, 0,
+                chatIntent, 0);
         views.setPendingIntentTemplate(R.id.lv_widget_conversations, chatPendingIntent);
         
         appWidgetManager.updateAppWidget(appWidgetId, views);

@@ -147,12 +147,14 @@ public class RegisterUserActivity extends AppCompatActivity {
                                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
+                                        String url = uploadAvatarToFirebase(mBitmapByteArray);
+                                        Log.d("url ref", url);
+                                        user.setImageUrl(url);
                                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                                         FirebaseDatabase.getInstance().getReference()
                                                 .child("users")
                                                 .child(firebaseUser.getUid())
                                                 .setValue(user);
-                                        uploadAvatarToFirebase(mBitmapByteArray);
                                         Intent intent = new Intent(mContext, MainActivity.class);
                                         startActivity(intent);
                                         finish();
@@ -169,15 +171,19 @@ public class RegisterUserActivity extends AppCompatActivity {
         }
     }
 
-    public void uploadAvatarToFirebase(byte[] dataArray) {
+    public String uploadAvatarToFirebase(byte[] dataArray) {
+        final StringBuilder imageUrlBuilder = new StringBuilder();
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageReference = storage.getReference();
         StorageReference imagesRef = storageReference.child("images");
-        StorageReference userImageRef = imagesRef
+        imageUrlBuilder.append(imagesRef.getBucket());
+        final StorageReference userImageRef = imagesRef
                 .child(mAuth.getCurrentUser().getUid())
                 .child("avatar.jpg");
         if (dataArray != null) {
             UploadTask uploadTask = userImageRef.putBytes(dataArray);
+            imageUrlBuilder.append(userImageRef.getPath());
+            Log.d("storage ref: ", imageUrlBuilder.toString());
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
@@ -186,10 +192,11 @@ public class RegisterUserActivity extends AppCompatActivity {
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Log.d("Success", " yes");
+
                 }
             });
         }
+        return imageUrlBuilder.toString();
     }
 
     private class BrowseOnClickListener implements View.OnClickListener {

@@ -12,6 +12,8 @@ public class Conversation {
     private String user1;
     private String user2;
     private String conversationId;
+    private String user1ImageRef;
+    private String user2ImageRef;
 
     public Conversation() {}
 
@@ -23,6 +25,19 @@ public class Conversation {
         this.user1 = user1;
         this.user2 = user2;
         this.conversationId = conversationId;
+    }
+
+    public Conversation(String lastMessage, String lastMessageType, Long timeStamp, String user1,
+                        String user2, String conversationId, String user1ImageRef,
+                        String user2ImageRef) {
+        this.lastMessage = lastMessage;
+        this.lastMessageType = lastMessageType;
+        this.timeStamp = timeStamp;
+        this.user1 = user1;
+        this.user2 = user2;
+        this.conversationId = conversationId;
+        this.user1ImageRef = user1ImageRef;
+        this.user2ImageRef = user2ImageRef;
     }
 
     public String getConversationId() {
@@ -71,6 +86,22 @@ public class Conversation {
 
     public void setTimeStamp(Long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getUser1ImageRef() {
+        return user1ImageRef;
+    }
+
+    public void setUser1ImageRef(String user1ImageRef) {
+        this.user1ImageRef = user1ImageRef;
+    }
+
+    public String getUser2ImageRef() {
+        return user2ImageRef;
+    }
+
+    public void setUser2ImageRef(String user2ImageRef) {
+        this.user2ImageRef = user2ImageRef;
     }
 
     @Override

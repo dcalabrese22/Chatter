@@ -10,12 +10,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.dcalabrese22.dan.chatter.helpers.GlideApp;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.squareup.picasso.Picasso;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by dan on 9/13/17.
@@ -53,9 +50,9 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
         }
 
         v.findViewById(R.id.conversation_top).setSelected(true);
-        final CircleImageView avatar = (CircleImageView) v.findViewById(R.id.user_avatar);
+        final ImageView avatar = v.findViewById(R.id.user_avatar);
 
-        final CircleImageView check = (CircleImageView) v.findViewById(R.id.user_message_checked);
+        final ImageView check = v.findViewById(R.id.user_message_checked);
         ObjectAnimator flipAvatarForwards = ObjectAnimator.ofFloat(avatar, "rotationY", 0f, 90f);
         final ObjectAnimator flipAvatarBack = ObjectAnimator.ofFloat(avatar, "rotationY", 90f, 0f);
         final ObjectAnimator flipCheckForwards = ObjectAnimator.ofFloat(check, "rotationY", 90f, 180f);
@@ -133,10 +130,10 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
         mLastMessage.setText(message);
     }
 
-    public void setAvatar(Context context, StorageReference reference) {
+    public void setAvatar(Context context, String storagePath) {
+        StorageReference reference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://"+storagePath);
         GlideApp.with(context)
                 .load(reference)
                 .into(mAvatar);
-
     }
 }

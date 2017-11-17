@@ -113,25 +113,30 @@ public class NewMessageFragment extends Fragment {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User currentUser = dataSnapshot.getValue(User.class);
-                        final String user1 = currentUser.getUserName();
-                        final String user2 = mName.getText().toString();
+                        final String userImageRef = currentUser.getImageUrl();
+                        final String user1Name = currentUser.getUserName();
+                        final String user2Name = mName.getText().toString();
                         reference.child("users")
-                                .orderByChild("userName").equalTo(user2)
+                                .orderByChild("userName").equalTo(user2Name)
                                 .addChildEventListener(new ChildEventListener() {
                                     @Override
                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                                         String user2Key = dataSnapshot.getKey();
+                                        User user2 = dataSnapshot.getValue(User.class);
+                                        String user2ImageRef = user2.getImageUrl();
                                         Log.d("user2Key", user2Key);
                                         Conversation conversationFromUser1 = new Conversation(mBody.getText().toString(),
-                                                "sent", timeStamp, user1, user2, pushKey);
+                                                "sent", timeStamp, user1Name, user2Name,
+                                                pushKey, userImageRef, user2ImageRef);
                                         conversationRef.setValue(conversationFromUser1);
                                         Conversation receivedByUser2 = new Conversation(mBody.getText().toString(),
-                                                "received", timeStamp, user2, user1, pushKey);
+                                                "received", timeStamp, user2Name,
+                                                user1Name, pushKey, user2ImageRef, userImageRef);
                                         DatabaseReference user2ConversationRef = reference.child("conversations")
                                                 .child(user2Key).child(pushKey);
                                         user2ConversationRef.setValue(receivedByUser2);
                                         ChatMessage message = new ChatMessage(mBody.getText().toString(),
-                                                user1, timeStamp);
+                                                user1Name, timeStamp);
                                         messagesRef.setValue(message);
                                     }
 

@@ -27,9 +27,9 @@
 
 
                 <ImageView
-                android:id="@+id/widget_user_avatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp" />
+                    android:id="@+id/widget_user_avatar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp" />
 
             </RelativeLayout>
 

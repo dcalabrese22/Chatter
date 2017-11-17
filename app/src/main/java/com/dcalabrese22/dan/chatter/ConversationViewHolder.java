@@ -14,6 +14,8 @@ import com.dcalabrese22.dan.chatter.helpers.GlideApp;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by dan on 9/13/17.
  */
@@ -50,9 +52,9 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
         }
 
         v.findViewById(R.id.conversation_top).setSelected(true);
-        final ImageView avatar = v.findViewById(R.id.user_avatar);
+        final CircleImageView avatar = v.findViewById(R.id.user_avatar);
 
-        final ImageView check = v.findViewById(R.id.user_message_checked);
+        final CircleImageView check = v.findViewById(R.id.user_message_checked);
         ObjectAnimator flipAvatarForwards = ObjectAnimator.ofFloat(avatar, "rotationY", 0f, 90f);
         final ObjectAnimator flipAvatarBack = ObjectAnimator.ofFloat(avatar, "rotationY", 90f, 0f);
         final ObjectAnimator flipCheckForwards = ObjectAnimator.ofFloat(check, "rotationY", 90f, 180f);

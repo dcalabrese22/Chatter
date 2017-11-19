@@ -179,7 +179,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                             StorageReference storageImagesRef =
                                     storage.getReference("images/" + userId +
                                             "/avatar.jpg");
-                            Log.d("image ref", storageImagesRef.toString());
                             final long ONE_MEGABYTE = 1024 * 1024;
                             storageImagesRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                                 @Override

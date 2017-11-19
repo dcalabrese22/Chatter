@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +34,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
@@ -93,8 +95,9 @@ public class MessagesListFragment extends Fragment {
 
 
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference conversationRef = reference.child("conversations")
-                .child(mUserId);
+        Query conversationRef = reference.child("conversations")
+                .child(mUserId)
+                .orderByChild("timeStamp");
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
 
@@ -115,53 +118,9 @@ public class MessagesListFragment extends Fragment {
             protected void populateViewHolder(final ConversationViewHolder viewHolder,
                                               final Conversation model, int position) {
 
-                final FirebaseStorage storage = FirebaseStorage.getInstance();
-
                 viewHolder.setLastMessage(model.getLastMessage());
                 viewHolder.setUser(model.getUser2());
                 viewHolder.setAvatar(mContext, model.getUser2ImageRef());
-//                reference.child("users").orderByChild("userName").equalTo(mUser2)
-//                        .addChildEventListener(new ChildEventListener() {
-//                            @Override
-//                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                                String userId = dataSnapshot.getKey();
-//                                Log.d("userId", userId);
-//                                User user2 = dataSnapshot.getValue(User.class);
-//                                String user2Email = user2.getEmail();
-//                                Boolean hasUserImage = user2.getHasUserImage();
-//                                if (hasUserImage) {
-//                                    StorageReference storageImagesRef =
-//                                            storage.getReference("images/" + userId +
-//                                                    "/avatar.jpg");
-//                                    Log.d("image ref", storageImagesRef.toString());
-//                                    viewHolder.setAvatar(mContext, storageImagesRef);
-//
-//                                } else {
-//
-//                                }
-//
-//                            }
-//
-//                            @Override
-//                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(DatabaseError databaseError) {
-//
-//                            }
-//                        });
             }
 
             @Override
@@ -203,9 +162,9 @@ public class MessagesListFragment extends Fragment {
                     }
                 }));
         LinearLayoutManager ll = new LinearLayoutManager(getContext());
-
         mRecyclerView.setLayoutManager(ll);
         ll.setReverseLayout(true);
+        ll.setStackFromEnd(true);
         mRecyclerView.setAdapter(mAdapter);
 
         return rootView;

@@ -7,4 +7,5 @@ package com.dcalabrese22.dan.chatter.interfaces;
 public interface MessageExtrasListener {
 
     void getMessageExtras(String id, String user2);
+    void getMessageExtras(String id, String user2, boolean cameFromWidget);
 }

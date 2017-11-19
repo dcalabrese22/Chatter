@@ -16,7 +16,7 @@ public class ChatViewHolder extends RecyclerView.ViewHolder {
 
     public ChatViewHolder(View view) {
         super(view);
-        mChatBody = (TextView) view.findViewById(R.id.tv_chat_body);
+        mChatBody = view.findViewById(R.id.tv_chat_body);
 
     }
 

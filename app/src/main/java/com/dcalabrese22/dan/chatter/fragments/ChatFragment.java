@@ -1,6 +1,8 @@
 package com.dcalabrese22.dan.chatter.fragments;
 
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
@@ -10,11 +12,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.ChatViewHolder;
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
@@ -39,9 +43,9 @@ import java.util.Map;
 public class ChatFragment extends Fragment {
 
     private String mMessagePushKey;
-    private String mCorrespondent;
     private String mUserName;
     private String mUser2Name;
+    private Context mContext;
     private FirebaseRecyclerAdapter<ChatMessage, RecyclerView.ViewHolder> mAdapter;
 
 
@@ -54,6 +58,7 @@ public class ChatFragment extends Fragment {
         mMessagePushKey = getArguments().getString(MainActivity.MESSAGE_PUSH_KEY);
         mUserName = getArguments().getString(MainActivity.USER_NAME);
         mUser2Name = getArguments().getString(MainActivity.USER2_NAME);
+        mContext = context;
         super.onAttach(context);
 
     }
@@ -70,8 +75,8 @@ public class ChatFragment extends Fragment {
         mButtonSend.setEnabled(false);
 
 
-        final EditText reply = (EditText) rootView.findViewById(R.id.et_reply);
-        reply.setHint("Send reply to " + mCorrespondent);
+        final EditText reply = rootView.findViewById(R.id.et_reply);
+        reply.setHint("Send reply to " + mUser2Name);
 
         reply.addTextChangedListener(new TextWatcher() {
             @Override
@@ -101,10 +106,6 @@ public class ChatFragment extends Fragment {
 
             }
         });
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child("messages")
-                .child(mMessagePushKey);
 
         mButtonSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,6 +144,14 @@ public class ChatFragment extends Fragment {
                         Conversation forUser2 = new Conversation(body, "received", timeStamp,
                                 mUser2Name, mUserName, mMessagePushKey);
                         user2ConversationRef.setValue(forUser2);
+                        AppWidgetManager manager = AppWidgetManager.getInstance(mContext);
+                        int[] widgetIds = manager
+                                .getAppWidgetIds(new ComponentName(getContext()
+                                        .getPackageName(),
+                                        AppWidget.class.getName()));
+                        manager
+                                .notifyAppWidgetViewDataChanged(widgetIds,
+                                        R.id.lv_widget_conversations);
                     }
 
                     @Override
@@ -170,12 +179,14 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.rv_chat);
+        RecyclerView recyclerView = rootView.findViewById(R.id.rv_chat);
         LinearLayoutManager ll = new LinearLayoutManager(getActivity());
-        ll.setStackFromEnd(true);
 
         recyclerView.setLayoutManager(ll);
-
+        Query reference = FirebaseDatabase.getInstance().getReference()
+                .child("messages")
+                .child(mMessagePushKey)
+                .orderByChild("timeStamp");
 
         mAdapter = new FirebaseRecyclerAdapter<ChatMessage, RecyclerView.ViewHolder>(
                 ChatMessage.class,
@@ -223,6 +234,8 @@ public class ChatFragment extends Fragment {
         };
 
         recyclerView.setAdapter(mAdapter);
+        recyclerView.smoothScrollToPosition(15);
+        mAdapter.notifyDataSetChanged();
 
         return rootView;
     }

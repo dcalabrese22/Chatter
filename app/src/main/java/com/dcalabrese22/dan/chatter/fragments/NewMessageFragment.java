@@ -3,9 +3,11 @@ package com.dcalabrese22.dan.chatter.fragments;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +17,13 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.R;
+import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -36,14 +40,33 @@ import java.util.List;
 
 public class NewMessageFragment extends Fragment {
 
-    AutoCompleteTextView mName;
-    EditText mBody;
+    private AutoCompleteTextView mName;
+    private EditText mBody;
+    private boolean mCameFromWidget = false;
+    private String mPushKey;
+    private String mUser1Name;
+    private String mUser2Name;
+    private MessageExtrasListener mListener;
+    private Context mContext;
 
 
     public NewMessageFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mListener = (MessageExtrasListener) context;
+        mContext = context;
+        if (getArguments() != null) {
+            if (getArguments().containsKey(MainActivity.CAME_FROM_WIDGE_TO_NEW_MESSAGE)) {
+                mCameFromWidget = getArguments()
+                        .getBoolean(MainActivity.CAME_FROM_WIDGE_TO_NEW_MESSAGE);
+                Log.d("mCameFromWidget", String.valueOf(mCameFromWidget));
+            }
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -56,8 +79,6 @@ public class NewMessageFragment extends Fragment {
 
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         DatabaseReference usersRef = reference.child("users");
-
-        fab.setOnClickListener(new SendNewMessageListener());
 
         final List<String> autoCompleteNames = new ArrayList<>();
 
@@ -86,6 +107,7 @@ public class NewMessageFragment extends Fragment {
                 android.R.layout.simple_dropdown_item_1line, autoCompleteNames);
 
         mName.setAdapter(adapter);
+        fab.setOnClickListener(new SendNewMessageListener());
 
         return rootView;
     }
@@ -103,9 +125,9 @@ public class NewMessageFragment extends Fragment {
                 final DatabaseReference conversationRef = reference.child("conversations")
                         .child(currentUserId)
                         .push();
-                final String pushKey = conversationRef.getKey();
+                mPushKey = conversationRef.getKey();
                 final DatabaseReference messagesRef = reference.child("messages")
-                        .child(pushKey).push();
+                        .child(mPushKey).push();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
                         .child("users")
                         .child(currentUserId);
@@ -114,10 +136,10 @@ public class NewMessageFragment extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User currentUser = dataSnapshot.getValue(User.class);
                         final String userImageRef = currentUser.getImageUrl();
-                        final String user1Name = currentUser.getUserName();
-                        final String user2Name = mName.getText().toString();
+                        mUser1Name = currentUser.getUserName();
+                        mUser2Name = mName.getText().toString();
                         reference.child("users")
-                                .orderByChild("userName").equalTo(user2Name)
+                                .orderByChild("userName").equalTo(mUser2Name)
                                 .addChildEventListener(new ChildEventListener() {
                                     @Override
                                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -126,18 +148,20 @@ public class NewMessageFragment extends Fragment {
                                         String user2ImageRef = user2.getImageUrl();
                                         Log.d("user2Key", user2Key);
                                         Conversation conversationFromUser1 = new Conversation(mBody.getText().toString(),
-                                                "sent", timeStamp, user1Name, user2Name,
-                                                pushKey, userImageRef, user2ImageRef);
+                                                "sent", timeStamp, mUser1Name, mUser2Name,
+                                                mPushKey, userImageRef, user2ImageRef);
                                         conversationRef.setValue(conversationFromUser1);
                                         Conversation receivedByUser2 = new Conversation(mBody.getText().toString(),
-                                                "received", timeStamp, user2Name,
-                                                user1Name, pushKey, user2ImageRef, userImageRef);
+                                                "received", timeStamp, mUser2Name,
+                                                mUser1Name, mPushKey, user2ImageRef, userImageRef);
                                         DatabaseReference user2ConversationRef = reference.child("conversations")
-                                                .child(user2Key).child(pushKey);
+                                                .child(user2Key).child(mPushKey);
                                         user2ConversationRef.setValue(receivedByUser2);
                                         ChatMessage message = new ChatMessage(mBody.getText().toString(),
-                                                user1Name, timeStamp);
+                                                mUser1Name, timeStamp);
                                         messagesRef.setValue(message);
+                                        mListener.getMessageExtras(mPushKey, mUser2Name, mCameFromWidget);
+                                        Log.d("new msg frag", mUser2Name);
                                     }
 
                                     @Override
@@ -169,10 +193,15 @@ public class NewMessageFragment extends Fragment {
                     }
                 });
             }
+            AppWidgetManager manager = AppWidgetManager.getInstance(mContext);
+            int[] widgetIds = manager
+                    .getAppWidgetIds(new ComponentName(getContext()
+                            .getPackageName(),
+                            AppWidget.class.getName()));
+            manager
+                    .notifyAppWidgetViewDataChanged(widgetIds,
+                            R.id.lv_widget_conversations);
             getActivity().getSupportFragmentManager().popBackStack();
-            AppWidgetManager manager = AppWidgetManager.getInstance(getContext());
-            int[] widgetIds = manager.getAppWidgetIds(new ComponentName(getContext().getPackageName(), AppWidget.class.getName()));
-            manager.notifyAppWidgetViewDataChanged(widgetIds, R.id.lv_widget_conversations);
         }
     }
 

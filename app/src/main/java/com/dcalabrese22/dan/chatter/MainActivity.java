@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
     public static final String USER2_NAME = "user2_name";
     private String mUserName;
     private String mUserId;
-    private boolean cameFromWidget = false;
+    private boolean mCameFromWidget = false;
+    public static final String CAME_FROM_WIDGE_TO_NEW_MESSAGE = "came_from_widget_to_new_message";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +64,14 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
             Log.d("launchedIntentValue:", launchedIntentValue);
             if (launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
                 NewMessageFragment newMessageFragment = new NewMessageFragment();
+                Bundle bundle = new Bundle();
+                bundle.putBoolean(CAME_FROM_WIDGE_TO_NEW_MESSAGE, true);
+                newMessageFragment.setArguments(bundle);
                 transaction.add(R.id.fragment_container, newMessageFragment).commit();
             } if (launchedIntentValue.equals(WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE)) {
                 String messageId = launchedIntent.getStringExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA);
                 getCorrespondentAndStartChat(messageId);
-                cameFromWidget = true;
+                mCameFromWidget = true;
             }
         } else {
 
@@ -127,8 +131,18 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
     }
 
     @Override
+    public void getMessageExtras(String id, String user2, boolean cameFromWidget) {
+        Bundle bundle = new Bundle();
+        bundle.putString(MESSAGE_PUSH_KEY, id);
+        bundle.putString(USER_NAME, mUserName);
+        bundle.putString(USER2_NAME, user2);
+        mCameFromWidget = cameFromWidget;
+        launchChatFragment(bundle);
+    }
+
+    @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0 || cameFromWidget) {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0 || mCameFromWidget) {
             finish();
         } else {
             getSupportFragmentManager().popBackStack();

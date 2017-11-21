@@ -17,7 +17,7 @@ import com.google.firebase.messaging.RemoteMessage;
  * Created by dcalabrese on 10/16/2017.
  */
 
-public class PbMessengerFirebaseMessagingService extends FirebaseMessagingService {
+public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {

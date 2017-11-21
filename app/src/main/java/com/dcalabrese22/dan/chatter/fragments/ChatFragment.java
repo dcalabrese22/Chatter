@@ -141,9 +141,13 @@ public class ChatFragment extends Fragment {
                         DatabaseReference user2ConversationRef = reference.child("conversations")
                                 .child(user2Key)
                                 .child(mMessagePushKey);
-                        Conversation forUser2 = new Conversation(body, "received", timeStamp,
-                                mUser2Name, mUserName, mMessagePushKey);
-                        user2ConversationRef.setValue(forUser2);
+
+                        Map<String, Object> m = new HashMap<>();
+                        m.put("lastMessage", body);
+                        m.put("lastMessageType", "reveived");
+                        m.put("timeStamp", timeStamp);
+
+                        user2ConversationRef.updateChildren(m);
                         AppWidgetManager manager = AppWidgetManager.getInstance(mContext);
                         int[] widgetIds = manager
                                 .getAppWidgetIds(new ComponentName(getContext()

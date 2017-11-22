@@ -1,5 +1,6 @@
 package com.dcalabrese22.dan.chatter.services;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -19,16 +20,20 @@ import com.google.firebase.messaging.RemoteMessage;
 
 public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
 
+    public static final String FROM_NOTIFICATION = "from_notification";
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         String title = remoteMessage.getData().get("title");
         String body = remoteMessage.getData().get("body");
-        showNotification(title, body);
+        String conversationId = remoteMessage.getData().get("id");
+        showNotification(title, body, conversationId);
     }
 
-    private void showNotification(String title, String body) {
+    private void showNotification(String title, String body, String id) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(FROM_NOTIFICATION, id);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -39,6 +44,7 @@ public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
                 .setContentIntent(pendingIntent);
+        notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

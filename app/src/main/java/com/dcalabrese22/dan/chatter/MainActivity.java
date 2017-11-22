@@ -15,6 +15,7 @@ import com.dcalabrese22.dan.chatter.fragments.ChatFragment;
 import com.dcalabrese22.dan.chatter.fragments.MessagesListFragment;
 import com.dcalabrese22.dan.chatter.fragments.NewMessageFragment;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
+import com.dcalabrese22.dan.chatter.services.ChatterFirebaseMessagingService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
     public static final String USER2_NAME = "user2_name";
     private String mUserName;
     private String mUserId;
-    private boolean mCameFromWidget = false;
+    private boolean mCameFromWidgetOrNotification = false;
     public static final String CAME_FROM_WIDGE_TO_NEW_MESSAGE = "came_from_widget_to_new_message";
 
     @Override
@@ -68,11 +69,17 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
                 bundle.putBoolean(CAME_FROM_WIDGE_TO_NEW_MESSAGE, true);
                 newMessageFragment.setArguments(bundle);
                 transaction.add(R.id.fragment_container, newMessageFragment).commit();
-            } if (launchedIntentValue.equals(WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE)) {
+            }
+            if (launchedIntentValue.equals(WidgetDataProvider.CONVERSATION_FRAGMENT_VALUE)) {
                 String messageId = launchedIntent.getStringExtra(WidgetDataProvider.WIDGET_CONVERSATION_ID_EXTRA);
                 getCorrespondentAndStartChat(messageId);
-                mCameFromWidget = true;
+                mCameFromWidgetOrNotification = true;
             }
+        } else if (launchedIntent.hasExtra(ChatterFirebaseMessagingService.FROM_NOTIFICATION)){
+            String messageId = launchedIntent
+                    .getStringExtra(ChatterFirebaseMessagingService.FROM_NOTIFICATION);
+            getCorrespondentAndStartChat(messageId);
+            mCameFromWidgetOrNotification = true;
         } else {
 
             MessagesListFragment fragment = new MessagesListFragment();
@@ -136,13 +143,13 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         bundle.putString(MESSAGE_PUSH_KEY, id);
         bundle.putString(USER_NAME, mUserName);
         bundle.putString(USER2_NAME, user2);
-        mCameFromWidget = cameFromWidget;
+        mCameFromWidgetOrNotification = cameFromWidget;
         launchChatFragment(bundle);
     }
 
     @Override
     public void onBackPressed() {
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0 || mCameFromWidget) {
+        if (getSupportFragmentManager().getBackStackEntryCount() == 0 || mCameFromWidgetOrNotification) {
             finish();
         } else {
             getSupportFragmentManager().popBackStack();

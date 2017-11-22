@@ -123,27 +123,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void createNewUser(DatabaseReference reference) {
-        if (mEmail.getText().toString().equals("") || mPassword.getText().toString().equals("")) {
-            Toast.makeText(mContext, R.string.enter_credentials, Toast.LENGTH_SHORT).show();
-        } else {
-            mAuth.createUserWithEmailAndPassword(mEmail.getText().toString(), mPassword.getText().toString())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        mProgressbar.setVisibility(View.VISIBLE);
-                        FirebaseUser user = mAuth.getCurrentUser();
-
-                        Intent intent = new Intent(mContext, MainActivity.class);
-                        startActivity(intent);
-                    }
-                }
-            });
-
-        }
-    }
-
     public void signInUser() {
 
         if (mEmail.getText().toString().equals("") || mPassword.getText().toString().equals("")) {
@@ -153,10 +132,13 @@ public class LoginActivity extends AppCompatActivity {
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            mProgressbar.setVisibility(View.VISIBLE);
-                            Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-                            Intent intent = new Intent(mContext, MainActivity.class);
-                            startActivity(intent);
+
+                            if (task.isSuccessful()) {
+                                mProgressbar.setVisibility(View.VISIBLE);
+                                Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                                Intent intent = new Intent(mContext, MainActivity.class);
+                                startActivity(intent);
+                            }
 
                             // If sign in fails, display a message to the user. If sign in succeeds
                             // the auth state listener will be notified and logic to handle the

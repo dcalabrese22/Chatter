@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
             String messageId = launchedIntent
                     .getStringExtra(ChatterFirebaseMessagingService.FROM_NOTIFICATION);
             getCorrespondentAndStartChat(messageId);
+            Log.d("came from notification", messageId);
             mCameFromWidgetOrNotification = true;
         } else {
 

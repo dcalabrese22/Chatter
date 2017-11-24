@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
+import com.dcalabrese22.dan.chatter.Objects.Notification;
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.R;
@@ -121,7 +122,7 @@ public class NewMessageFragment extends Fragment {
             } else {
                 final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                 final Long timeStamp = new Date().getTime();
-                String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                final String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 final DatabaseReference conversationRef = reference.child("conversations")
                         .child(currentUserId)
                         .push();
@@ -160,6 +161,11 @@ public class NewMessageFragment extends Fragment {
                                         ChatMessage message = new ChatMessage(mBody.getText().toString(),
                                                 mUser1Name, timeStamp);
                                         messagesRef.setValue(message);
+                                        Notification notification =
+                                                new Notification(user2Key, mUser1Name,
+                                                        mBody.getText().toString());
+                                        reference.child("Notifications").child(mPushKey).push()
+                                                .setValue(notification);
                                         mListener.getMessageExtras(mPushKey, mUser2Name, mCameFromWidget);
                                         Log.d("new msg frag", mUser2Name);
                                     }

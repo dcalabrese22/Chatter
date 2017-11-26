@@ -43,10 +43,8 @@ import java.io.IOException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by dcalabrese on 11/3/2017.
- */
 
+//Activity for creating a new user
 public class RegisterUserActivity extends AppCompatActivity {
 
     @BindView(R.id.signup_input_name)
@@ -69,8 +67,7 @@ public class RegisterUserActivity extends AppCompatActivity {
 
     public static final int PICK_IMAGE = 1;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private boolean mHasUserImage = false;
+    private boolean mHasUserImage = true;
     private Context mContext;
     private byte[] mBitmapByteArray;
     private static final int REQUEST_READ_CONTACTS = 100;
@@ -100,6 +97,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         finish();
     }
 
+    //Custom click listener for opening the login activity
     private class LoginOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -109,6 +107,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         }
     }
 
+    //Custom click listener for signing a user up
     private class SignupOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -129,18 +128,22 @@ public class RegisterUserActivity extends AppCompatActivity {
                     break;
             }
 
+            //first check firebase for a user with that username
             DatabaseReference existingUser = FirebaseDatabase.getInstance()
                     .getReference().child("users").child(userName);
             existingUser.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    //alert the user to choose a new username if one already exists
                     if (dataSnapshot.exists()) {
                         Toast.makeText(mContext, "Username already exists. Please sign in to " +
                                 "continue or choose a new username.", Toast.LENGTH_LONG).show();
+                        //firebase won't accept passwords less than 6 characters
                     } else if (password.length() < 6) {
                         Toast.makeText(mContext,
                                 "Password must be at least 6 characters",
                                 Toast.LENGTH_LONG).show();
+                        //if all is ok, create the new user and start the main activity
                     } else {
                         final User user = new User(userName, email, age, gender.toString(), mHasUserImage);
                         mAuth.createUserWithEmailAndPassword(email, password)
@@ -171,6 +174,11 @@ public class RegisterUserActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Uploads a user image to Firebase storage
+     * @param dataArray The image as an array of bytes
+     * @return String path to Firebase storage location
+     */
     public String uploadAvatarToFirebase(byte[] dataArray) {
         final StringBuilder imageUrlBuilder = new StringBuilder();
         FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -183,7 +191,6 @@ public class RegisterUserActivity extends AppCompatActivity {
         if (dataArray != null) {
             UploadTask uploadTask = userImageRef.putBytes(dataArray);
             imageUrlBuilder.append(userImageRef.getPath());
-            Log.d("storage ref: ", imageUrlBuilder.toString());
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
@@ -195,12 +202,16 @@ public class RegisterUserActivity extends AppCompatActivity {
 
                 }
             });
+        } else {
+            String defaultLocation = "/images/default/avatar.jpg";
+            imageUrlBuilder.append(defaultLocation);
+
         }
         return imageUrlBuilder.toString();
     }
 
+    //Custom click listener for starting an intent to browse for an image stored on the device
     private class BrowseOnClickListener implements View.OnClickListener {
-
         @Override
         public void onClick(View view) {
             Intent intent = new Intent();
@@ -210,12 +221,14 @@ public class RegisterUserActivity extends AppCompatActivity {
         }
     }
 
+    //Gets the result of the image chosen by the user
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE)
             if (resultCode == RESULT_OK) {
                 if (data == null) {
+                    mHasUserImage = true;
                     return;
                 } else {
                     try {
@@ -234,6 +247,10 @@ public class RegisterUserActivity extends AppCompatActivity {
             }
     }
 
+    /**
+     * Determines if the user has granted permission to read from the contacts
+     * @return
+     */
     private boolean mayRequestContacts() {
 
         if (checkSelfPermission(android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
@@ -253,6 +270,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         return false;
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
@@ -262,19 +280,14 @@ public class RegisterUserActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Suggests autocomplet values for the email field based on contacts stored on the device
+     */
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
         }
         EmailLoader emailLoader = new EmailLoader(this, mEmail);
         getLoaderManager().initLoader(0, null, emailLoader);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
     }
 }

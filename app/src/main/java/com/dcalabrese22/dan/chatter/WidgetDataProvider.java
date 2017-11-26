@@ -13,7 +13,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -36,15 +35,12 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by dan on 10/9/17.
- */
 
+//Class that provides the data for the widget
 public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
 
     private Context mContext = null;
     private ArrayList<WidgetListItem> mWidgetListItems = new ArrayList<>();
-    private List<String> fakeData = new ArrayList<>();
     private AppWidgetManager mManager;
     private int[] mWidgetIds;
     private CountDownLatch mLatch;
@@ -60,7 +56,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         mContext = context;
         mManager = AppWidgetManager.getInstance(mContext);
         mWidgetIds = mManager.getAppWidgetIds(new ComponentName(mContext.getPackageName(), AppWidget.class.getName()));
-
     }
 
     @Override
@@ -127,14 +122,10 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     }
 
 
-    public void makeFakeData() throws InterruptedException{
-        mWidgetListItems.clear();
-        for (int i = 0; i < 10; i++) {
-            String value = String.valueOf(i);
-            mWidgetListItems.add(new WidgetListItem(value, value, value));
-        }
-    }
-
+    /**
+     * Populates a listview in the widget
+     * @throws InterruptedException
+     */
     public void populateWidgetListView() throws InterruptedException {
         mWidgetListItems.clear();
         mLatch = new CountDownLatch(10);
@@ -161,8 +152,13 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         mLatch.await(7, TimeUnit.SECONDS);
     }
 
+    /**
+     * Gets the profile picture of the other user in the conversation
+     * @param user2 Name of the other user
+     * @return Bitmap of the image
+     * @throws InterruptedException
+     */
     public Bitmap getUser2Avatar(String user2) throws InterruptedException {
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         final FirebaseStorage storage = FirebaseStorage.getInstance();
         final ArrayList<Bitmap> images = new ArrayList<>();
@@ -218,6 +214,11 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
 
     }
 
+    /**
+     * Creates a circular bitmap from a square one since widgets can't use custom imageviews
+     * @param bitmap Bitmap to modify
+     * @return New bitmap that is circular
+     */
     private Bitmap getCircleBitmap(Bitmap bitmap) {
         final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
                 bitmap.getHeight(), Bitmap.Config.ARGB_8888);

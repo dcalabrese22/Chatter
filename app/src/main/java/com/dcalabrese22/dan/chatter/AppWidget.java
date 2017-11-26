@@ -13,6 +13,8 @@ import com.dcalabrese22.dan.chatter.services.WidgetService;
 /**
  * Implementation of App Widget functionality.
  */
+
+//class for creating the widget
 public class AppWidget extends AppWidgetProvider {
 
     public static final String WIDGET_INTENT_EXTRA = "widget_intent_extra";

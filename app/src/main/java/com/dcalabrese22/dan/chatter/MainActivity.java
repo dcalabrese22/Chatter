@@ -24,9 +24,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 
+//main activity for the app
 public class MainActivity extends AppCompatActivity implements MessageExtrasListener {
 
-    private String mCorrespondent;
     public static final String MESSAGE_PUSH_KEY = "message_push_key";
     public static final String USER_NAME = "user_name";
     public static final String USER2_NAME = "user2_name";
@@ -57,12 +57,12 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         });
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         Intent launchedIntent = getIntent();
-        Log.d("launched intent extra?",
-                String.valueOf(launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTRA)));
 
+        //check to see if the app is being launched from the widget or from a notification
         if (launchedIntent.hasExtra(AppWidget.WIDGET_INTENT_EXTRA)) {
             String launchedIntentValue = launchedIntent.getStringExtra(AppWidget.WIDGET_INTENT_EXTRA);
-            Log.d("launchedIntentValue:", launchedIntentValue);
+            //check if the app is being opened from the new message button on fragment or from
+            //a conversation
             if (launchedIntentValue.equals(AppWidget.NEW_MESSAGE_FRAGMENT_VALUE)) {
                 NewMessageFragment newMessageFragment = new NewMessageFragment();
                 Bundle bundle = new Bundle();
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
             getCorrespondentAndStartChat(messageId);
             Log.d("came from notification", messageId);
             mCameFromWidgetOrNotification = true;
+            //if the app is being opened regularly proceed as normal
         } else {
 
             MessagesListFragment fragment = new MessagesListFragment();
@@ -95,6 +96,10 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         }
     }
 
+    /**
+     * Gets the other user who is part of the chat based on a message id
+     * @param messageId the message id of the message to look up in firebase
+     */
     public void getCorrespondentAndStartChat(final String messageId) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
@@ -120,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         });
     }
 
+    /**
+     * Starts the chat fragment
+     * @param bundle the bundle to set as arguments for the chat fragment
+     */
     public void launchChatFragment(Bundle bundle) {
         ChatFragment fragment = new ChatFragment();
         fragment.setArguments(bundle);
@@ -129,6 +138,11 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
                 .commit();
     }
 
+    /**
+     * Interface method for getting extras from a fragment
+     * @param id Firebase message id
+     * @param user2 The username of the other user
+     */
     @Override
     public void getMessageExtras(String id, String user2) {
         Bundle bundle = new Bundle();
@@ -138,16 +152,24 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
         launchChatFragment(bundle);
     }
 
+    /**
+     * Interface method for getting extras from a fragment
+     * @param id Firebase message id
+     * @param user2 The username of the other user
+     * @param cameFromWidgetOrNotification Boolean telling wheather the app was opened from the
+     *                                     widget or notification
+     */
     @Override
-    public void getMessageExtras(String id, String user2, boolean cameFromWidget) {
+    public void getMessageExtras(String id, String user2, boolean cameFromWidgetOrNotification) {
         Bundle bundle = new Bundle();
         bundle.putString(MESSAGE_PUSH_KEY, id);
         bundle.putString(USER_NAME, mUserName);
         bundle.putString(USER2_NAME, user2);
-        mCameFromWidgetOrNotification = cameFromWidget;
+        mCameFromWidgetOrNotification = cameFromWidgetOrNotification;
         launchChatFragment(bundle);
     }
 
+    //Hanldes what happens when the back button is pressed
     @Override
     public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() == 0 || mCameFromWidgetOrNotification) {

@@ -4,10 +4,10 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dcalabrese on 11/3/2017.
  */
 
+//custom object that represents a user of the app
 public class User {
 
     private String userName;
-    private String name;
     private String email;
     private String age;
     private String gender;
@@ -22,16 +22,6 @@ public class User {
         this.age = age;
         this.gender = gender;
         this.hasUserImage = hasUserImage;
-    }
-
-    public User(String userName, String name, String email, String age, String gender, Boolean hasUserImage, String imageUrl) {
-        this.userName = userName;
-        this.name = name;
-        this.email = email;
-        this.age = age;
-        this.gender = gender;
-        this.hasUserImage = hasUserImage;
-        this.imageUrl = imageUrl;
     }
 
     public Boolean getHasUserImage() {

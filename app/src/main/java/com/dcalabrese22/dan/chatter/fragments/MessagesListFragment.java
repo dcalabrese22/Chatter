@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,12 +34,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
+//fragment for displaying a list of conversations
 public class MessagesListFragment extends Fragment {
 
     private String mUserId;
@@ -75,8 +73,11 @@ public class MessagesListFragment extends Fragment {
         mContext = getContext();
 
         final ProgressBar progressBar = rootView.findViewById(R.id.progress_loading_messages);
+        //show progress bar while data is loading
         progressBar.setVisibility(View.VISIBLE);
+
         final FloatingActionButton fab = rootView.findViewById(R.id.message_list_fab);
+        //open the new message fragment when fab is clicked
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,8 +93,6 @@ public class MessagesListFragment extends Fragment {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mUserId = user.getUid();
 
-
-
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         Query conversationRef = reference.child("conversations")
                 .child(mUserId)
@@ -101,6 +100,7 @@ public class MessagesListFragment extends Fragment {
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
 
+        //firebase recycler adapter for displaying each conversation
         mAdapter = new FirebaseRecyclerAdapter<Conversation, ConversationViewHolder>(
                 Conversation.class,
                 R.layout.fragment_messages_list,
@@ -126,13 +126,18 @@ public class MessagesListFragment extends Fragment {
             @Override
             public void onDataChanged() {
                 super.onDataChanged();
+                //when the data is loaded, hide the progress bar
                 progressBar.setVisibility(View.INVISIBLE);
             }
         };
 
+        //handles show and long press events for each item in the recyclerview
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), mRecyclerView,
                 new OnRecyclerItemClickListener() {
 
+                    //if the users is in select mode, which was activated by long pressing prior to
+                    //keep selecting conversations. Otherwise, open the selected conversation
+                    //to reply to a chat
                     @Override
                     public void onItemClick(View view, int position) {
                         if (mIsMultiSelectMode) {
@@ -147,6 +152,8 @@ public class MessagesListFragment extends Fragment {
                         }
                     }
 
+                    //when the user long presses a conversation view, conversation select mode
+                    //is actived
                     @Override
                     public void OnItemLongClick(View view, int position) {
 
@@ -193,11 +200,14 @@ public class MessagesListFragment extends Fragment {
             return false;
         }
 
+        //handles functionality when the user presses the delete button when in action mode
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_delete:
+                    //alert the user of removed conversations
                     Toast.makeText(getContext(), "Removed", Toast.LENGTH_SHORT).show();
+                    //remove each selected conversation from firebase for only this particular user
                     for (SelectedConversation selectedConversation : mSelectedConversations) {
                         String selectedId = selectedConversation.getConversation().getConversationId();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
@@ -206,6 +216,7 @@ public class MessagesListFragment extends Fragment {
                                 .child(selectedId);
                         reference.removeValue();
 
+                        //update the widget
                         Intent intent = new Intent(getContext(), AppWidget.class);
                         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 
@@ -232,12 +243,17 @@ public class MessagesListFragment extends Fragment {
         }
     };
 
+    //handles selecting multiple conversations
     public void multiSelect(View view, int position) {
+        //get the viewholder that was selected
         ConversationViewHolder viewHolder = (ConversationViewHolder) mRecyclerView
                 .getChildViewHolder(view);
+        //get the conversation that was selected
         Conversation selected = (Conversation) mAdapter.getItem(position);
+        //create new selected conversation object
         SelectedConversation selectedConversation = new SelectedConversation(view, viewHolder,
                 position, selected);
+        //check if the conversation has alrady been selected and thus would need to be de-selected
         if (mActionMode != null) {
             if (mConversationsSelected.contains(selected)) {
                 viewHolder.flipAvatar(view);
@@ -249,17 +265,21 @@ public class MessagesListFragment extends Fragment {
                         i.remove();
                     }
                 }
+                //if the conversation hasn't already been selected, add it to the list of selected
+                //conversations and change the user avatar to a check mark
             } else {
                 mConversationsSelected.add(selected);
                 mSelectedConversations.add(selectedConversation);
                 viewHolder.flipAvatar(view);
                 view.setActivated(true);
             }
+            //show the number of selected conversations
             mActionMode.setTitle("" + mSelectedConversations.size());
         }
     }
 
-
+    //de-selects all previously selected conversations for when the user exits the action mode
+    //and didn't delete the conversations
     public void deselectAll() {
         for (SelectedConversation selected : mSelectedConversations) {
             selected.getViewHolder().flipAvatar(selected.getSelectedView());

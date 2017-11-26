@@ -15,6 +15,7 @@ import java.io.InputStream;
  * Created by dan on 11/9/17.
  */
 
+//class for using the glide module which loads images for firebase
 @GlideModule
 public class MyAppGlideModule extends AppGlideModule {
 

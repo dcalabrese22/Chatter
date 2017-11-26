@@ -4,6 +4,7 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dan on 9/7/17.
  */
 
+//custom object that represents a conversation between 2 users
 public class Conversation {
 
     private String lastMessage;

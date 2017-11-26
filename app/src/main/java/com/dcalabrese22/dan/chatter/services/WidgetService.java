@@ -9,6 +9,7 @@ import com.dcalabrese22.dan.chatter.WidgetDataProvider;
  * Created by dan on 10/9/17.
  */
 
+
 public class WidgetService extends RemoteViewsService {
 
     @Override

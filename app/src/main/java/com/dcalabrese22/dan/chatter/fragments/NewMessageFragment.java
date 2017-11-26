@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +16,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
 import com.dcalabrese22.dan.chatter.Objects.Notification;
 import com.dcalabrese22.dan.chatter.Objects.User;
-import com.dcalabrese22.dan.chatter.AppWidget;
 import com.dcalabrese22.dan.chatter.R;
 import com.dcalabrese22.dan.chatter.interfaces.MessageExtrasListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +37,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+//fragment for creating a new conversation
 public class NewMessageFragment extends Fragment {
 
     private AutoCompleteTextView mName;
@@ -64,7 +63,6 @@ public class NewMessageFragment extends Fragment {
             if (getArguments().containsKey(MainActivity.CAME_FROM_WIDGE_TO_NEW_MESSAGE)) {
                 mCameFromWidget = getArguments()
                         .getBoolean(MainActivity.CAME_FROM_WIDGE_TO_NEW_MESSAGE);
-                Log.d("mCameFromWidget", String.valueOf(mCameFromWidget));
             }
         }
     }
@@ -81,11 +79,12 @@ public class NewMessageFragment extends Fragment {
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
         DatabaseReference usersRef = reference.child("users");
 
+
         final List<String> autoCompleteNames = new ArrayList<>();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String userId = user.getUid();
-
+        //suggest names for the name field
         usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -113,9 +112,11 @@ public class NewMessageFragment extends Fragment {
         return rootView;
     }
 
+    //handles sending a new message to firebase
     private class SendNewMessageListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
+            //check to make sure user has selected someone to message and put text in the message box
             if (mName.getText().toString().equals("") || mBody.getText().toString().equals("")) {
                 Toast.makeText(getContext(), R.string.missing_fields,
                         Toast.LENGTH_SHORT).show();
@@ -148,26 +149,29 @@ public class NewMessageFragment extends Fragment {
                                         User user2 = dataSnapshot.getValue(User.class);
                                         String user2ImageRef = user2.getImageUrl();
                                         Log.d("user2Key", user2Key);
+                                        //add conversation to user 1 conversation list
                                         Conversation conversationFromUser1 = new Conversation(mBody.getText().toString(),
                                                 "sent", timeStamp, mUser1Name, mUser2Name,
                                                 mPushKey, userImageRef, user2ImageRef);
                                         conversationRef.setValue(conversationFromUser1);
+                                        //add conversation to user 2 conversation list
                                         Conversation receivedByUser2 = new Conversation(mBody.getText().toString(),
                                                 "received", timeStamp, mUser2Name,
                                                 mUser1Name, mPushKey, user2ImageRef, userImageRef);
                                         DatabaseReference user2ConversationRef = reference.child("conversations")
                                                 .child(user2Key).child(mPushKey);
                                         user2ConversationRef.setValue(receivedByUser2);
+                                        //add message to message node
                                         ChatMessage message = new ChatMessage(mBody.getText().toString(),
                                                 mUser1Name, timeStamp);
                                         messagesRef.setValue(message);
+                                        //add message to notification node
                                         Notification notification =
                                                 new Notification(user2Key, mUser1Name,
                                                         mBody.getText().toString());
                                         reference.child("Notifications").child(mPushKey).push()
                                                 .setValue(notification);
                                         mListener.getMessageExtras(mPushKey, mUser2Name, mCameFromWidget);
-                                        Log.d("new msg frag", mUser2Name);
                                     }
 
                                     @Override

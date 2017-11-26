@@ -8,6 +8,7 @@ import com.dcalabrese22.dan.chatter.ConversationViewHolder;
  * Created by dcalabrese on 10/9/2017.
  */
 
+//custom object that represents a selected conversation
 public class SelectedConversation {
 
     private View mView;

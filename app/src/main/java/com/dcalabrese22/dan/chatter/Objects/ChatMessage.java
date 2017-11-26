@@ -4,6 +4,7 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dan on 9/7/17.
  */
 
+//custom ovject that represents a single chat message
 public class ChatMessage {
 
     private String body;

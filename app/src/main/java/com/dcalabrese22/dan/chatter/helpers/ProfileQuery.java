@@ -2,7 +2,7 @@ package com.dcalabrese22.dan.chatter.helpers;
 
 import android.provider.ContactsContract;
 
-
+//constants for emailloader query
 public class ProfileQuery {
 
     public static final String[] PROJECTION = {ContactsContract.CommonDataKinds.Email.ADDRESS,

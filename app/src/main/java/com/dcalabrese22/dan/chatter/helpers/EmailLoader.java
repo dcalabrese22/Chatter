@@ -17,6 +17,7 @@ import java.util.List;
  * Created by dcalabrese on 11/6/2017.
  */
 
+//loads email addresses from users contact list to aid in signing in or registering
 public class EmailLoader implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private Context mContext;

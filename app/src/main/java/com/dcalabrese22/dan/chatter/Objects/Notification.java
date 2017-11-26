@@ -4,6 +4,7 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dan on 11/23/17.
  */
 
+//custom object that represents a notification to be sent
 public class Notification {
 
     private String sentTo;

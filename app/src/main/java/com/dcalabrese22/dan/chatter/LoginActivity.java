@@ -28,15 +28,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-/**
- * A login screen that offers login via email/password.
- */
+//activity for logging a user in to the chat app
 public class LoginActivity extends AppCompatActivity {
 
 
     private static final String TAG = "LoginActivity";
     private static final String SAVED_EMAIL = "saved_email";
     private static final String SAVE_PASSWORD = "saved_password";
+    private static final int REQUEST_READ_CONTACTS = 100;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private AutoCompleteTextView mEmail;
@@ -44,16 +43,12 @@ public class LoginActivity extends AppCompatActivity {
     private Button mSignInButton;
     private Context mContext;
     private ProgressBar mProgressbar;
-    private static final int REQUEST_READ_CONTACTS = 100;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
         mSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         Button joinButton = (Button) findViewById(R.id.new_user_button);
@@ -86,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth.addAuthStateListener(mAuthListener);
 
+        //signs the user in if account is valid
         mSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        //starts the register new user activity
         joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+
 
         mPassword.setOnEditorActionListener(new EditText.OnEditorActionListener(){
             public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
@@ -123,8 +121,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    //signs in the user to the app
     public void signInUser() {
 
+        //checks if the user has entered data into the fields
         if (mEmail.getText().toString().equals("") || mPassword.getText().toString().equals("")) {
             Toast.makeText(mContext, R.string.enter_credentials, Toast.LENGTH_SHORT).show();
         } else {
@@ -133,18 +133,14 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
 
+                            //if the user signs in, show the progress bar and start the mainactivity
                             if (task.isSuccessful()) {
                                 mProgressbar.setVisibility(View.VISIBLE);
-                                Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                                 Intent intent = new Intent(mContext, MainActivity.class);
                                 startActivity(intent);
                             }
-
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
+                            //alert the user the credentials they entered are incorrect
                             if (!task.isSuccessful()) {
-                                Log.w(TAG, "signInWithEmail:failed", task.getException());
                                 Toast.makeText(LoginActivity.this, R.string.auth_failed,
                                         Toast.LENGTH_SHORT).show();
                             }
@@ -163,9 +159,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-
-
-
+    //shows a pop up asking if the app can read contacts from the devices to use in autocompleting
+    //email address
     private boolean mayRequestContacts() {
 
         if (checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {

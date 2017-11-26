@@ -4,6 +4,7 @@ package com.dcalabrese22.dan.chatter.Objects;
  * Created by dcalabrese on 11/13/2017.
  */
 
+//custom object that represents a message displayed on the widget
 public class WidgetListItem {
 
     private String sender;

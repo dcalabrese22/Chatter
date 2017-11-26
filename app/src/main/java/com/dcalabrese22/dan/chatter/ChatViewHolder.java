@@ -8,11 +8,10 @@ import android.widget.TextView;
  * Created by dan on 9/14/17.
  */
 
+//custom viewholder for a single chat message
 public class ChatViewHolder extends RecyclerView.ViewHolder {
 
     private TextView mChatBody;
-    private TextView mChatSender;
-    private TextView mTimeSent;
 
     public ChatViewHolder(View view) {
         super(view);

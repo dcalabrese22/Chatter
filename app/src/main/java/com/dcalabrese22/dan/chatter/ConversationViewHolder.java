@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -17,10 +16,7 @@ import com.google.firebase.storage.StorageReference;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * Created by dan on 9/13/17.
- */
-
+//custom viewholder for a single conversation
 public class ConversationViewHolder extends RecyclerView.ViewHolder {
 
 
@@ -39,6 +35,7 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
         mLinearLayout = view.findViewById(R.id.conversation_top);
     }
 
+    //"flips" the users picture to show a checkmark when the conversation is selected
     public void flipAvatar(View v) {
         RelativeLayout container = (RelativeLayout) v.findViewById(R.id.image_container);
         Object o = container.getTag();

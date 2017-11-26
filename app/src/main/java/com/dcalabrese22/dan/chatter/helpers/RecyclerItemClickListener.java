@@ -12,6 +12,7 @@ import com.dcalabrese22.dan.chatter.interfaces.OnRecyclerItemClickListener;
  * Created by dcalabrese on 10/6/2017.
  */
 
+//class for handling touch events in the messageslistfragment recyclerview
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
 
     private OnRecyclerItemClickListener mClickListener;

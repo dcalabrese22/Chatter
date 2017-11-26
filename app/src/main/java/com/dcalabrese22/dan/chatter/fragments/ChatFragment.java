@@ -23,6 +23,7 @@ import com.dcalabrese22.dan.chatter.ChatViewHolder;
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.Objects.ChatMessage;
 import com.dcalabrese22.dan.chatter.Objects.Conversation;
+import com.dcalabrese22.dan.chatter.Objects.Notification;
 import com.dcalabrese22.dan.chatter.Objects.User;
 import com.dcalabrese22.dan.chatter.R;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -138,6 +139,10 @@ public class ChatFragment extends Fragment {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         String user2Key = dataSnapshot.getKey();
+                        Notification notification = new Notification(user2Key, mUserName,
+                                body);
+                        reference.child("Notifications").child(mMessagePushKey)
+                                .push().setValue(notification);
                         DatabaseReference user2ConversationRef = reference.child("conversations")
                                 .child(user2Key)
                                 .child(mMessagePushKey);

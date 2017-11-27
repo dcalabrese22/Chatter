@@ -67,7 +67,7 @@ public class RegisterUserActivity extends AppCompatActivity {
 
     public static final int PICK_IMAGE = 1;
     private FirebaseAuth mAuth;
-    private boolean mHasUserImage = true;
+    private boolean mHasUserImage = false;
     private Context mContext;
     private byte[] mBitmapByteArray;
     private static final int REQUEST_READ_CONTACTS = 100;
@@ -239,7 +239,6 @@ public class RegisterUserActivity extends AppCompatActivity {
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
                         mBitmapByteArray = baos.toByteArray();
-                        mHasUserImage = true;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

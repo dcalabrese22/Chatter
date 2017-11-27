@@ -31,7 +31,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -171,7 +170,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                         User user2 = dataSnapshot.getValue(User.class);
                         Boolean hasUserImage = user2.getHasUserImage();
                         if (hasUserImage) {
-                            String imageUrl = user2.getImageUrl();
                             StorageReference storageImagesRef =
                                     storage.getReference("images/" + userId +
                                             "/avatar.jpg");
@@ -184,6 +182,16 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                                 }
                             });
                         } else {
+                            StorageReference storageImagesRef =
+                                    storage.getReference("images/default/avatar.jpg");
+                            final long ONE_MEGABYTE = 1024 * 1024;
+                            storageImagesRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                                @Override
+                                public void onSuccess(byte[] bytes) {
+                                    images.add(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+                                    mLatch.countDown();
+                                }
+                            });
 
                         }
 

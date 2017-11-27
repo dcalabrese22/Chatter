@@ -45,6 +45,7 @@ public class MessagesListFragment extends Fragment {
     private Context mContext;
     private String mUser2;
 
+    private FloatingActionButton mFab;
     private FirebaseRecyclerAdapter mAdapter;
     private MessageExtrasListener mListener;
     private boolean mIsMultiSelectMode = false;
@@ -76,9 +77,9 @@ public class MessagesListFragment extends Fragment {
         //show progress bar while data is loading
         progressBar.setVisibility(View.VISIBLE);
 
-        final FloatingActionButton fab = rootView.findViewById(R.id.message_list_fab);
+        mFab = rootView.findViewById(R.id.message_list_fab);
         //open the new message fragment when fab is clicked
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 NewMessageFragment fragment = new NewMessageFragment();
@@ -192,6 +193,7 @@ public class MessagesListFragment extends Fragment {
             inflater.inflate(R.menu.contextual_menu, menu);
             mContextMenu = menu;
             mSelectedConversations.clear();
+            mFab.setVisibility(View.INVISIBLE);
             return true;
         }
 
@@ -240,6 +242,7 @@ public class MessagesListFragment extends Fragment {
             mActionMode = null;
             mIsMultiSelectMode = false;
             deselectAll();
+            mFab.setVisibility(View.VISIBLE);
         }
     };
 

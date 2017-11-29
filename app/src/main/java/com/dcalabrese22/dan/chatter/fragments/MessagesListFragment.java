@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,9 +51,13 @@ public class MessagesListFragment extends Fragment {
     private MessageExtrasListener mListener;
     private boolean mIsMultiSelectMode = false;
     private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
     private ActionMode mActionMode;
     private ArrayList<SelectedConversation> mSelectedConversations = new ArrayList<>();
     private ArrayList<Conversation> mConversationsSelected = new ArrayList<>();
+    private ArrayList<Integer> mSelectedPositions = new ArrayList<>();
+
+    private final String SELECTED_POSITIONS_KEY = "selected_positions_key";
 
     public MessagesListFragment() {
         // Required empty public constructor
@@ -100,6 +105,10 @@ public class MessagesListFragment extends Fragment {
                 .orderByChild("timeStamp");
 
         mRecyclerView = rootView.findViewById(R.id.rv_conversations);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mLayoutManager.setReverseLayout(true);
+        mLayoutManager.setStackFromEnd(true);
 
         //firebase recycler adapter for displaying each conversation
         mAdapter = new FirebaseRecyclerAdapter<Conversation, ConversationViewHolder>(
@@ -126,11 +135,14 @@ public class MessagesListFragment extends Fragment {
 
             @Override
             public void onDataChanged() {
-                super.onDataChanged();
                 //when the data is loaded, hide the progress bar
                 progressBar.setVisibility(View.INVISIBLE);
+                Log.d("child count:", String.valueOf(mLayoutManager.getChildCount()));
+//                super.onDataChanged();
             }
         };
+
+        mRecyclerView.setAdapter(mAdapter);
 
         //handles show and long press events for each item in the recyclerview
         mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(), mRecyclerView,
@@ -142,7 +154,9 @@ public class MessagesListFragment extends Fragment {
                     @Override
                     public void onItemClick(View view, int position) {
                         if (mIsMultiSelectMode) {
-                            multiSelect(view, position);
+//                            multiSelect(view, position);
+                            view.setActivated(true);
+                            mSelectedPositions.add(position);
                         } else {
                             Conversation itemClicked = (Conversation) mAdapter.getItem(position);
                             String conversationId = itemClicked.getConversationId();
@@ -165,15 +179,16 @@ public class MessagesListFragment extends Fragment {
                                 mActionMode = getActivity().startActionMode(mActionModeCallBack);
                             }
                         }
-                        multiSelect(view, position);
-
+//                        multiSelect(view, position);
+                        view.setActivated(true);
                     }
                 }));
-        LinearLayoutManager ll = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(ll);
-        ll.setReverseLayout(true);
-        ll.setStackFromEnd(true);
-        mRecyclerView.setAdapter(mAdapter);
+
+
+        if (savedInstanceState != null) {
+            mSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_POSITIONS_KEY);
+            reselectViews(mSelectedPositions);
+        }
 
         return rootView;
     }
@@ -246,6 +261,13 @@ public class MessagesListFragment extends Fragment {
         }
     };
 
+    public void reselectViews(ArrayList<Integer> positions) {
+        for (Integer position : positions) {
+            View view = mLayoutManager.findViewByPosition(position);
+            view.setActivated(true);
+        }
+    }
+
     //handles selecting multiple conversations
     public void multiSelect(View view, int position) {
         //get the viewholder that was selected
@@ -292,5 +314,9 @@ public class MessagesListFragment extends Fragment {
         mConversationsSelected.clear();
     }
 
-
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putIntegerArrayList(SELECTED_POSITIONS_KEY, mSelectedPositions);
+        super.onSaveInstanceState(outState);
+    }
 }

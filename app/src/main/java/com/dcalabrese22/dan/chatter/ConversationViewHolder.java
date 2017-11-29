@@ -37,7 +37,7 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
 
     //"flips" the users picture to show a checkmark when the conversation is selected
     public void flipAvatar(View v) {
-        RelativeLayout container = (RelativeLayout) v.findViewById(R.id.image_container);
+        RelativeLayout container = v.findViewById(R.id.image_container);
         Object o = container.getTag();
         boolean isActivated = !o.equals("checked");
         v.setActivated(isActivated);

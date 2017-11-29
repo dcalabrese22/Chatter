@@ -248,7 +248,6 @@ public class ChatFragment extends Fragment {
         };
 
         recyclerView.setAdapter(mAdapter);
-        recyclerView.smoothScrollToPosition(15);
         mAdapter.notifyDataSetChanged();
 
         return rootView;

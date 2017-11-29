@@ -58,6 +58,7 @@ public class MessagesListFragment extends Fragment {
     private ArrayList<Integer> mSelectedPositions = new ArrayList<>();
 
     private final String SELECTED_POSITIONS_KEY = "selected_positions_key";
+    private final String MULTI_SELECT_MODE_KEY = "multi_select_mode_key";
 
     public MessagesListFragment() {
         // Required empty public constructor
@@ -76,6 +77,7 @@ public class MessagesListFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_messages_list, container,
                 false);
+
         mContext = getContext();
 
         final ProgressBar progressBar = rootView.findViewById(R.id.progress_loading_messages);
@@ -95,6 +97,15 @@ public class MessagesListFragment extends Fragment {
                         .commit();
             }
         });
+
+        if (savedInstanceState != null) {
+            mIsMultiSelectMode = savedInstanceState.getBoolean(MULTI_SELECT_MODE_KEY);
+            if (mIsMultiSelectMode) {
+                mSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_POSITIONS_KEY);
+                Log.d("positions", mSelectedPositions.toString());
+                mActionMode = getActivity().startActionMode(mActionModeCallBack);
+            }
+        }
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         mUserId = user.getUid();
@@ -131,14 +142,22 @@ public class MessagesListFragment extends Fragment {
                 viewHolder.setLastMessage(model.getLastMessage());
                 viewHolder.setUser(model.getUser2());
                 viewHolder.setAvatar(mContext, model.getUser2ImageRef());
+                //if we're coming back to the fragment after selections were made
+                if (mSelectedPositions.contains(position)) {
+                    SelectedConversation selectedConversation = new SelectedConversation(viewHolder.itemView,
+                            viewHolder, position, model);
+                    mSelectedConversations.add(selectedConversation);
+                    mConversationsSelected.add(model);
+                    viewHolder.itemView.setActivated(true);
+                    viewHolder.flipAvatar(viewHolder.itemView);
+                }
             }
 
             @Override
             public void onDataChanged() {
                 //when the data is loaded, hide the progress bar
                 progressBar.setVisibility(View.INVISIBLE);
-                Log.d("child count:", String.valueOf(mLayoutManager.getChildCount()));
-//                super.onDataChanged();
+                super.onDataChanged();
             }
         };
 
@@ -154,14 +173,11 @@ public class MessagesListFragment extends Fragment {
                     @Override
                     public void onItemClick(View view, int position) {
                         if (mIsMultiSelectMode) {
-//                            multiSelect(view, position);
-                            view.setActivated(true);
-                            mSelectedPositions.add(position);
+                            multiSelect(view, position);
                         } else {
                             Conversation itemClicked = (Conversation) mAdapter.getItem(position);
                             String conversationId = itemClicked.getConversationId();
                             mUser2 = itemClicked.getUser2();
-
                             mListener.getMessageExtras(conversationId, mUser2);
 
                         }
@@ -174,21 +190,13 @@ public class MessagesListFragment extends Fragment {
 
                         if (!mIsMultiSelectMode) {
                             mIsMultiSelectMode = true;
-
                             if (mActionMode == null) {
                                 mActionMode = getActivity().startActionMode(mActionModeCallBack);
                             }
                         }
-//                        multiSelect(view, position);
-                        view.setActivated(true);
+                        multiSelect(view, position);
                     }
                 }));
-
-
-        if (savedInstanceState != null) {
-            mSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_POSITIONS_KEY);
-            reselectViews(mSelectedPositions);
-        }
 
         return rootView;
     }
@@ -278,12 +286,13 @@ public class MessagesListFragment extends Fragment {
         //create new selected conversation object
         SelectedConversation selectedConversation = new SelectedConversation(view, viewHolder,
                 position, selected);
-        //check if the conversation has alrady been selected and thus would need to be de-selected
+        //check if the conversation has already been selected and thus would need to be de-selected
         if (mActionMode != null) {
             if (mConversationsSelected.contains(selected)) {
                 viewHolder.flipAvatar(view);
                 view.setActivated(false);
                 mConversationsSelected.remove(selected);
+                mSelectedPositions.remove(position);
                 for (Iterator<SelectedConversation> i = mSelectedConversations.listIterator(); i.hasNext();) {
                     Conversation c = i.next().getConversation();
                     if (c.equals(selected)) {
@@ -295,6 +304,8 @@ public class MessagesListFragment extends Fragment {
             } else {
                 mConversationsSelected.add(selected);
                 mSelectedConversations.add(selectedConversation);
+                mSelectedPositions.add(position);
+                Log.d("positions", mSelectedPositions.toString());
                 viewHolder.flipAvatar(view);
                 view.setActivated(true);
             }
@@ -312,10 +323,12 @@ public class MessagesListFragment extends Fragment {
         }
         mSelectedConversations.clear();
         mConversationsSelected.clear();
+        mSelectedPositions.clear();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(MULTI_SELECT_MODE_KEY, mIsMultiSelectMode);
         outState.putIntegerArrayList(SELECTED_POSITIONS_KEY, mSelectedPositions);
         super.onSaveInstanceState(outState);
     }

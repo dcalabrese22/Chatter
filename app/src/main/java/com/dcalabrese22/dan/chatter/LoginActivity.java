@@ -15,18 +15,18 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dcalabrese22.dan.chatter.helpers.EmailLoader;
+import com.dcalabrese22.dan.chatter.helpers.LogoAsyncTask;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 //activity for logging a user in to the chat app
 public class LoginActivity extends AppCompatActivity {
@@ -56,6 +56,9 @@ public class LoginActivity extends AppCompatActivity {
         mPassword = (EditText) findViewById(R.id.password);
         mContext = this;
         mProgressbar = (ProgressBar) findViewById(R.id.login_progress);
+        ImageView logo = findViewById(R.id.imageview_logo);
+
+        new LogoAsyncTask().execute(logo);
 
         if (savedInstanceState != null) {
             mEmail.setText(savedInstanceState.getString(SAVED_EMAIL));

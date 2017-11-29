@@ -30,13 +30,12 @@
             android:layout_marginTop="50dp"
             android:orientation="vertical">
 
-            <TextView
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/imageview_logo"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/pb_chat"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="30sp"
-                android:textStyle="italic"/>
+                android:layout_gravity="center"
+                android:tag="https://raw.githubusercontent.com/dcalabrese22/dcalabrese22.github.io/master/images/chatter-logo.png"/>
 
         </LinearLayout>
 

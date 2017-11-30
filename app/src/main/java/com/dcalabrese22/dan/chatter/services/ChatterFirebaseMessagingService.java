@@ -11,6 +11,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.R;
@@ -57,23 +58,22 @@ public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.d("Notification with sound", "Oreo");
             NotificationManager notificationManager = (NotificationManager)
                     getSystemService(NOTIFICATION_SERVICE);
             String id = "id_message";
-            String name = getString(R.string.notification_channel_name);
+            CharSequence name = getString(R.string.notification_channel_name);
             String description = getString(R.string.notification_channel_description);
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(id, name, importance);
             channel.setDescription(description);
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, id)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .setChannelId(id)
+            Notification.Builder builder = new Notification.Builder(this, id)
+                    .setSmallIcon(R.drawable.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(body)
                     .setAutoCancel(true)
-                    .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent);
 
             notificationManager.notify(1, builder.build());
@@ -86,7 +86,6 @@ public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setAutoCancel(true)
                     .setNumber(1)
-                    .setSound(defaultSoundUri)
                     .setContentIntent(pendingIntent)
                     .setChannelId(channelId);
             notificationBuilder.setDefaults(Notification.DEFAULT_ALL);
@@ -110,11 +109,12 @@ public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
             String description = getString(R.string.notification_channel_description);
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+            channel.setSound(null, null);
             channel.setDescription(description);
             notificationManager.createNotificationChannel(channel);
 
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                    .setSmallIcon(R.mipmap.ic_launcher)
+            Notification.Builder builder = new Notification.Builder(this, channelId)
+                    .setSmallIcon(R.drawable.ic_launcher)
                     .setChannelId(channelId)
                     .setContentTitle(title)
                     .setContentText(body)

@@ -46,4 +46,7 @@
     <string name="prompt_image">Image</string>
     <string name="btn_browse">Browse</string>
 
+    <string name="notification_channel_name">Messages</string>
+    <string name="notification_channel_description">Notification on new message</string>
+
 </resources>

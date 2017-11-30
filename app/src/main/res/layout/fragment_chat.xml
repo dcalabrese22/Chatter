@@ -38,23 +38,22 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
+                    android:layout_weight="1"
                     android:background="@null"
-                    android:hint="hint"
                     android:maxLines="3"
                     android:padding="10dp"
-                    android:layout_weight="1"
                     android:textCursorDrawable="@null" />
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/button_send"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:fabSize="normal"
                     android:layout_gravity="end"
                     android:layout_marginBottom="16dp"
                     android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_send_white_24px"
                     app:borderWidth="0dp"
-                    android:src="@drawable/ic_send_white_24px" />
+                    app:fabSize="normal" />
 
             </LinearLayout>
 
@@ -63,30 +62,22 @@
 
     </ScrollView>
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/nested_scroll"
+
+    <RelativeLayout
+        android:id="@+id/inner_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/chat_scrollview"
-        android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:layout_above="@id/chat_scrollview">
 
-        <RelativeLayout
-            android:id="@+id/inner_relative_layout"
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_chat"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:nestedScrollingEnabled="false" />
 
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rv_chat"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:nestedScrollingEnabled="false" />
-
-
-        </RelativeLayout>
-
-    </android.support.v4.widget.NestedScrollView>
+    </RelativeLayout>
 
 </RelativeLayout>

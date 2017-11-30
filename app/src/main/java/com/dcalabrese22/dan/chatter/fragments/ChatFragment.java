@@ -193,10 +193,9 @@ public class ChatFragment extends Fragment {
         });
 
 
-        RecyclerView recyclerView = rootView.findViewById(R.id.rv_chat);
-        LinearLayoutManager ll = new LinearLayoutManager(getActivity());
+        final RecyclerView recyclerView = rootView.findViewById(R.id.rv_chat);
+        final LinearLayoutManager ll = new LinearLayoutManager(getActivity());
 
-        recyclerView.setLayoutManager(ll);
         Query reference = FirebaseDatabase.getInstance().getReference()
                 .child("messages")
                 .child(mMessagePushKey)
@@ -245,10 +244,19 @@ public class ChatFragment extends Fragment {
                         return super.onCreateViewHolder(parent, viewType);
                 }
             }
+
+            @Override
+            public void onDataChanged() {
+                int count = getItemCount();
+                ll.scrollToPosition(mAdapter.getItemCount()-1);
+                super.onDataChanged();
+
+            }
         };
 
         recyclerView.setAdapter(mAdapter);
-        mAdapter.notifyDataSetChanged();
+        ll.setStackFromEnd(true);
+        recyclerView.setLayoutManager(ll);
 
         return rootView;
     }

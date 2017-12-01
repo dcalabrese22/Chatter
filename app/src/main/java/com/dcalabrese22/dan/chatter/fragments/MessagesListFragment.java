@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -102,7 +101,6 @@ public class MessagesListFragment extends Fragment {
             mIsMultiSelectMode = savedInstanceState.getBoolean(MULTI_SELECT_MODE_KEY);
             if (mIsMultiSelectMode) {
                 mSelectedPositions = savedInstanceState.getIntegerArrayList(SELECTED_POSITIONS_KEY);
-                Log.d("positions", mSelectedPositions.toString());
                 mActionMode = getActivity().startActionMode(mActionModeCallBack);
             }
         }
@@ -231,7 +229,8 @@ public class MessagesListFragment extends Fragment {
             switch (item.getItemId()) {
                 case R.id.action_delete:
                     //alert the user of removed conversations
-                    Toast.makeText(getContext(), "Removed", Toast.LENGTH_SHORT).show();
+                    String removed = getResources().getString(R.string.toast_removed);
+                    Toast.makeText(getContext(), removed, Toast.LENGTH_SHORT).show();
                     //remove each selected conversation from firebase for only this particular user
                     for (SelectedConversation selectedConversation : mSelectedConversations) {
                         String selectedId = selectedConversation.getConversation().getConversationId();
@@ -305,7 +304,6 @@ public class MessagesListFragment extends Fragment {
                 mConversationsSelected.add(selected);
                 mSelectedConversations.add(selectedConversation);
                 mSelectedPositions.add(position);
-                Log.d("positions", mSelectedPositions.toString());
                 viewHolder.flipAvatar(view);
                 view.setActivated(true);
             }

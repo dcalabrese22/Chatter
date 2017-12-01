@@ -32,6 +32,7 @@
     <string name="logout">Logout</string>
     <string name="avatar_showing">avatar</string>
     <string name="checked">checked</string>
+    <string name="unchecked">unchecked</string>
     <string name="menu_item_delete">Delete</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
@@ -48,5 +49,20 @@
 
     <string name="notification_channel_name">Messages</string>
     <string name="notification_channel_description">Notification on new message</string>
+
+    <string name="send_reply_to">Send reply to </string>
+    <string name="toast_removed">Removed</string>
+    <string name="sent">sent</string>
+    <string name="received">received</string>
+    <string name="lastMessage">lastMessage</string>
+    <string name="lastMessageType">lastMessageType</string>
+    <string name="timeStamp">timeStamp</string>
+
+    <string name="sort_desc">DESC</string>
+    <string name="channel_message_id">com.dcalabrese22.dan.chatter.message</string>
+
+    <string name="username_in_use">Username already exists. Please sign in to " +
+                                "continue or choose a new username.</string>
+    <string name="password_less_than_6">Password must be at least 6 characters</string>
 
 </resources>

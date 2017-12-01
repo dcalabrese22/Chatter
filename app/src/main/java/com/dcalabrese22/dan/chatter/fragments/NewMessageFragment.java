@@ -7,7 +7,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -148,15 +147,16 @@ public class NewMessageFragment extends Fragment {
                                         String user2Key = dataSnapshot.getKey();
                                         User user2 = dataSnapshot.getValue(User.class);
                                         String user2ImageRef = user2.getImageUrl();
-                                        Log.d("user2Key", user2Key);
                                         //add conversation to user 1 conversation list
+                                        String sent = getResources().getString(R.string.sent);
+                                        String received = getResources().getString(R.string.received);
                                         Conversation conversationFromUser1 = new Conversation(mBody.getText().toString(),
-                                                "sent", timeStamp, mUser1Name, mUser2Name,
+                                                sent, timeStamp, mUser1Name, mUser2Name,
                                                 mPushKey, userImageRef, user2ImageRef);
                                         conversationRef.setValue(conversationFromUser1);
                                         //add conversation to user 2 conversation list
                                         Conversation receivedByUser2 = new Conversation(mBody.getText().toString(),
-                                                "received", timeStamp, mUser2Name,
+                                                received, timeStamp, mUser2Name,
                                                 mUser1Name, mPushKey, user2ImageRef, userImageRef);
                                         DatabaseReference user2ConversationRef = reference.child("conversations")
                                                 .child(user2Key).child(mPushKey);

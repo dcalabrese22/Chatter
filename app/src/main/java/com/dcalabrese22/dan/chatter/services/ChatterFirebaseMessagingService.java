@@ -11,7 +11,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.dcalabrese22.dan.chatter.MainActivity;
 import com.dcalabrese22.dan.chatter.R;
@@ -54,22 +53,21 @@ public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
     //builds a notification with sound for when the app is in the background
     private void showNotificationWithSound(String title, String body, PendingIntent pendingIntent) {
         int notifyId = 1;
-        String channelId = "com.dcalabrese22.dan.chatter";
+        String channelId = getResources().getString(R.string.channel_message_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d("Notification with sound", "Oreo");
             NotificationManager notificationManager = (NotificationManager)
                     getSystemService(NOTIFICATION_SERVICE);
-            String id = "id_message";
+
             CharSequence name = getString(R.string.notification_channel_name);
             String description = getString(R.string.notification_channel_description);
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(id, name, importance);
+            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
             channel.setDescription(description);
             notificationManager.createNotificationChannel(channel);
 
-            Notification.Builder builder = new Notification.Builder(this, id)
+            Notification.Builder builder = new Notification.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(body)
@@ -99,7 +97,7 @@ public class ChatterFirebaseMessagingService extends FirebaseMessagingService {
     //builds a notification without sounds for when the app is in the foreground
     private void showNotificationWithNoSound(String title, String body, PendingIntent pendingIntent) {
 
-        String channelId = "com.dcalabrese22.dan.chatter";
+        String channelId = getResources().getString(R.string.channel_message_id);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager)

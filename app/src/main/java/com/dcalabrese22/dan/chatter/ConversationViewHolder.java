@@ -3,6 +3,7 @@ package com.dcalabrese22.dan.chatter;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -39,14 +40,16 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder {
     public void flipAvatar(View v) {
         RelativeLayout container = v.findViewById(R.id.image_container);
         Object o = container.getTag();
-        boolean isActivated = !o.equals("checked");
+        String checked = Resources.getSystem().getString(R.string.checked);
+        String unchecked = Resources.getSystem().getString(R.string.unchecked);
+        boolean isActivated = !o.equals(checked);
         v.setActivated(isActivated);
 
-        final boolean isChecked = !o.equals("checked");
+        final boolean isChecked = !o.equals(checked);
         if (isChecked) {
-            container.setTag("checked");
+            container.setTag(checked);
         } else {
-            container.setTag("unchecked");
+            container.setTag(unchecked);
         }
 
         v.findViewById(R.id.conversation_top).setSelected(true);

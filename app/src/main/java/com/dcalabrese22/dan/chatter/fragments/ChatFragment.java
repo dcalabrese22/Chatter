@@ -74,7 +74,8 @@ public class ChatFragment extends Fragment {
 
         final EditText reply = rootView.findViewById(R.id.et_reply);
         //show the username that is being replied to
-        reply.setHint("Send reply to " + mUser2Name);
+        String replyTo = getResources().getString(R.string.send_reply_to);
+        reply.setHint(replyTo + mUser2Name);
 
         //only after some text is entered into the reply field will the send button become
         //available to press
@@ -116,12 +117,16 @@ public class ChatFragment extends Fragment {
                 final DatabaseReference conversationRef = reference.child("conversations");
                 final String user1Id = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 final DatabaseReference user1Ref = conversationRef.child(user1Id);
+                final String lastMessage = getResources().getString(R.string.lastMessage);
+                final String lastMessageType = getResources().getString(R.string.lastMessageType);
+                final String sent = getResources().getString(R.string.sent);
+                final String timeStampString = getResources().getString(R.string.timeStamp);
                 //update the firebase node for the last message sent. ie this message
                 final Long timeStamp = new Date().getTime();
                 Map<String, Object> map = new HashMap<>();
-                map.put("lastMessage", reply.getText().toString());
-                map.put("lastMessageType", "sent");
-                map.put("timeStamp", timeStamp);
+                map.put(lastMessage, reply.getText().toString());
+                map.put(lastMessageType, sent);
+                map.put(timeStampString, timeStamp);
                 user1Ref.child(mMessagePushKey).updateChildren(map);
 
                 final String body = reply.getText().toString();
@@ -151,9 +156,10 @@ public class ChatFragment extends Fragment {
                                 .child(user2Key)
                                 .child(mMessagePushKey);
 
+                        String received = getResources().getString(R.string.received);
                         Map<String, Object> m = new HashMap<>();
-                        m.put("lastMessage", body);
-                        m.put("lastMessageType", "reveived");
+                        m.put(lastMessage, body);
+                        m.put(lastMessageType, received);
                         m.put("timeStamp", timeStamp);
 
                         user2ConversationRef.updateChildren(m);

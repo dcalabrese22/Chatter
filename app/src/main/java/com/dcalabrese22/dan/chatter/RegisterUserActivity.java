@@ -117,12 +117,14 @@ public class RegisterUserActivity extends AppCompatActivity {
             final String password = mPassword.getText().toString();
             final int radioId = mRadioGroup.getCheckedRadioButtonId();
             final StringBuilder gender = new StringBuilder();
+            String male = getResources().getString(R.string.male);
+            String female = getResources().getString(R.string.female);
             switch (radioId) {
                 case (R.id.male_radio_btn):
-                    gender.append("male");
+                    gender.append(male);
                     break;
                 case (R.id.female_radio_btn):
-                    gender.append("female");
+                    gender.append(female);
                     break;
                 default:
                     break;
@@ -135,13 +137,14 @@ public class RegisterUserActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     //alert the user to choose a new username if one already exists
+                    String usernameInUse = getResources().getString(R.string.username_in_use);
+                    String passwordLessThanSix = getResources().getString(R.string.password_less_than_6);
                     if (dataSnapshot.exists()) {
-                        Toast.makeText(mContext, "Username already exists. Please sign in to " +
-                                "continue or choose a new username.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, usernameInUse, Toast.LENGTH_LONG).show();
                         //firebase won't accept passwords less than 6 characters
                     } else if (password.length() < 6) {
                         Toast.makeText(mContext,
-                                "Password must be at least 6 characters",
+                                passwordLessThanSix,
                                 Toast.LENGTH_LONG).show();
                         //if all is ok, create the new user and start the main activity
                     } else {
@@ -151,7 +154,6 @@ public class RegisterUserActivity extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         String url = uploadAvatarToFirebase(mBitmapByteArray);
-                                        Log.d("url ref", url);
                                         user.setImageUrl(url);
                                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                                         FirebaseDatabase.getInstance().getReference()

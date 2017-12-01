@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -79,7 +78,6 @@ public class MainActivity extends AppCompatActivity implements MessageExtrasList
             String messageId = launchedIntent
                     .getStringExtra(ChatterFirebaseMessagingService.FROM_NOTIFICATION);
             getCorrespondentAndStartChat(messageId);
-            Log.d("came from notification", messageId);
             mCameFromWidgetOrNotification = true;
             //if the app is being opened regularly proceed as normal
         } else {

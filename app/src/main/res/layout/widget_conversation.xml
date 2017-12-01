@@ -29,7 +29,8 @@
                 <ImageView
                     android:id="@+id/widget_user_avatar"
                     android:layout_width="50dp"
-                    android:layout_height="50dp" />
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/userimage_content_description"/>
 
             </RelativeLayout>
 

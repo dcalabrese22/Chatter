@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.dcalabrese22.dan.chatter.MainActivity">
+    tools:context="com.dcalabrese22.dan.chatter.LoginActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -35,6 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:contentDescription="@string/logo_content_description"
                 android:tag="https://raw.githubusercontent.com/dcalabrese22/dcalabrese22.github.io/master/images/chatter-logo.png"/>
 
         </LinearLayout>
@@ -56,6 +57,7 @@
                     android:hint="@string/prompt_email"
                     android:inputType="textEmailAddress"
                     android:imeOptions="actionNext"
+                    android:nextFocusForward="@id/password"
                     android:maxLines="1"/>
 
             </android.support.design.widget.TextInputLayout>

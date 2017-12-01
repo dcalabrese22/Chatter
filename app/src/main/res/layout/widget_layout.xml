@@ -27,6 +27,7 @@
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:src="@drawable/ic_add_white_24px"
+            android:contentDescription="@string/widget_new_message_content_description"
             android:background="@color/colorPrimary"/>
     </RelativeLayout>
 

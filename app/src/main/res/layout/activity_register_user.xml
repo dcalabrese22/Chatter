@@ -24,6 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:nextFocusForward="@id/signup_input_email"
                 android:hint="@string/prompt_name"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -38,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textEmailAddress"
+                android:nextFocusForward="@id/signup_input_password"
                 android:hint="@string/prompt_email" />
         </android.support.design.widget.TextInputLayout>
 
@@ -51,7 +53,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_password"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:nextFocusForward="@id/signup_input_age"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout

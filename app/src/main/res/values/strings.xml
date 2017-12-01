@@ -65,4 +65,9 @@
                                 "continue or choose a new username.</string>
     <string name="password_less_than_6">Password must be at least 6 characters</string>
 
+    <string name="logo_content_description">Chatter</string>
+    <string name="userimage_content_description">User image</string>
+    <string name="conversation_check_content_description">check mark</string>
+    <string name="widget_new_message_content_description">New Message</string>
+
 </resources>

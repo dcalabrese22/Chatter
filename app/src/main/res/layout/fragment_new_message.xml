@@ -22,6 +22,7 @@
             android:imeOptions="actionNext"
             android:inputType="textAutoComplete"
             android:maxLines="1"
+            android:nextFocusForward="@id/et_new_message_body"
             style="@style/Widget.AppCompat.EditText"/>
 
 

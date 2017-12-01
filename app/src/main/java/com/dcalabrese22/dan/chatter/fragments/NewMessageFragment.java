@@ -148,8 +148,8 @@ public class NewMessageFragment extends Fragment {
                                         User user2 = dataSnapshot.getValue(User.class);
                                         String user2ImageRef = user2.getImageUrl();
                                         //add conversation to user 1 conversation list
-                                        String sent = getResources().getString(R.string.sent);
-                                        String received = getResources().getString(R.string.received);
+                                        String sent = "sent";
+                                        String received = "received";
                                         Conversation conversationFromUser1 = new Conversation(mBody.getText().toString(),
                                                 sent, timeStamp, mUser1Name, mUser2Name,
                                                 mPushKey, userImageRef, user2ImageRef);

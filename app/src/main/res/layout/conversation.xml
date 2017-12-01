@@ -30,7 +30,8 @@
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/user_avatar"
                     android:layout_width="50dp"
-                    android:layout_height="50dp" />
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/userimage_content_description"/>
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/user_message_checked"
@@ -38,6 +39,7 @@
                     android:layout_height="50dp"
                     android:scaleX="-1"
                     android:src="@drawable/ic_check_circle_white_24px"
+                    android:contentDescription="@string/conversation_check_content_description"
                     android:visibility="gone" />
 
             </RelativeLayout>

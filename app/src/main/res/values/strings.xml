@@ -69,5 +69,8 @@
     <string name="userimage_content_description">User image</string>
     <string name="conversation_check_content_description">check mark</string>
     <string name="widget_new_message_content_description">New Message</string>
+    <string name="chat_fab_content_description">Send reply</string>
+    <string name="conversations_fab_content_description">Create new message</string>
+    <string name="new_message_fab_content_description">Send new message</string>
 
 </resources>

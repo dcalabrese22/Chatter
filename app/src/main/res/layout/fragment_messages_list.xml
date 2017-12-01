@@ -17,6 +17,7 @@
         android:src="@drawable/ic_add_white_24px"
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
+        android:contentDescription="@string/conversations_fab_content_description"
         android:id="@+id/message_list_fab"/>
 
     <ProgressBar

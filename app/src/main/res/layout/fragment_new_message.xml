@@ -54,6 +54,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
+        android:contentDescription="@string/new_message_fab_content_description"
         android:src="@drawable/ic_send_white_24px" />
 
 </RelativeLayout>
